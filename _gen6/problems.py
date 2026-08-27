@@ -276,7 +276,7 @@ def problems() -> str:
 <section class="block" id="problems" data-search="DSA JavaScript problem bank" data-stype="Section">
   <p class="kicker">{len(P)} problems · easy → hard</p>
   <h2 class="section-title">Problem bank</h2>
-  <p class="lede">Solve on paper or in a scratch file first. Reveal after you have an idea. Practice items — not claimed official questions. After this bank, grind Phase 1 for more volume.</p>
+  <p class="lede">Mixed interview order. Each structure already has a <b>Practice this topic</b> gym in its own section — use those first to get fluent, then come here. Solve on paper or in a scratch file. Reveal after you have an idea. Practice items — not claimed official questions. After this bank, grind Phase 1 for more volume.</p>
   <div class="card" style="margin-bottom:16px">
     <p>Filter
       <select id="filter-status">

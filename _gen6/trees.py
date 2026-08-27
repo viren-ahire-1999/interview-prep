@@ -1,4 +1,5 @@
 from util import topic, diagram, callout, code
+from drills import recursion_gym, trees_gym, heaps_gym
 
 
 def recursion() -> str:
@@ -42,7 +43,9 @@ Memo: each n computed once → O(n)""")}
 <section class="block" id="recursion" data-search="Recursion JavaScript" data-stype="Section">
   <p class="kicker">The stack you cannot see</p>
   <h2 class="section-title">Recursion</h2>
+  <p><a href="#gym-recursion">Jump to recursion practice (6 problems) →</a></p>
   {t}
+  {recursion_gym()}
 </section>
 '''
 
@@ -133,7 +136,9 @@ function bstInsert(root, val) {
 <section class="block" id="trees" data-search="Binary trees BST JavaScript" data-stype="Section">
   <p class="kicker">Hierarchy</p>
   <h2 class="section-title">Trees and BST</h2>
+  <p><a href="#gym-trees">Jump to tree practice (10 problems) →</a></p>
   {t1}{t2}
+  {trees_gym()}
 </section>
 '''
 
@@ -195,6 +200,8 @@ function topK(nums, k) {
 <section class="block" id="heaps" data-search="Heap priority queue JavaScript" data-stype="Section">
   <p class="kicker">Priority</p>
   <h2 class="section-title">Heaps</h2>
+  <p><a href="#gym-heaps">Jump to heap practice (6 problems) →</a></p>
   {t}
+  {heaps_gym()}
 </section>
 '''

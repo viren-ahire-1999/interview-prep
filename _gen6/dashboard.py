@@ -12,6 +12,7 @@ def dashboard() -> str:
       <span class="chip">You implement the structure</span>
       <span class="chip">Then you solve</span>
       <span class="chip">Then you apply it at work</span>
+      <span class="chip">Topic practice gyms</span>
     </div>
     <p class="stat-sub" style="margin-top:12px">Every structure is explained as: what it is, how JS stores it (references, arrays vs objects vs <code>Map</code>), how you would write it from scratch, complexity, when a built-in is enough, and a practical study. Practice problems are labeled practice — not claimed official company questions.</p>
   </div>
@@ -33,7 +34,8 @@ def dashboard() -> str:
       <ol class="tight">
         <li>Open the <b>35-Day Plan</b>. Check every box.</li>
         <li>Read the named lesson. Type the implementation — do not only read.</li>
-        <li>Do the named problem standing up. Reveal after you have code.</li>
+        <li>At the bottom of that section, do the <b>Practice this topic</b> gym (5+ problems) before moving on.</li>
+        <li>Reveal only after you have code. Mark Solved / Review yourself.</li>
         <li>Do the practical study (where this shows up in a real app).</li>
         <li>Weekly: Mock Interview Mode. Save a debrief.</li>
         <li>Then grind Phase 1’s problem bank if you want Atlassian volume.</li>

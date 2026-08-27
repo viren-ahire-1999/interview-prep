@@ -1,4 +1,5 @@
 from util import topic, diagram, callout, code
+from drills import arrays_gym, strings_gym, hash_gym
 
 
 def arrays() -> str:
@@ -66,7 +67,9 @@ function rotateRight(arr, k) {
 <section class="block" id="arrays" data-search="Arrays JavaScript DSA" data-stype="Section">
   <p class="kicker">Foundation</p>
   <h2 class="section-title">Arrays</h2>
+  <p><a href="#gym-arrays">Jump to array practice (10 problems) →</a></p>
   {t1}{t2}
+  {arrays_gym()}
 </section>
 '''
 
@@ -96,7 +99,9 @@ function reverseWords(s) {
 <section class="block" id="strings" data-search="Strings JavaScript DSA" data-stype="Section">
   <p class="kicker">Foundation</p>
   <h2 class="section-title">Strings</h2>
+  <p><a href="#gym-strings">Jump to string practice (8 problems) →</a></p>
   {t}
+  {strings_gym()}
 </section>
 '''
 
@@ -135,6 +140,8 @@ function firstUniqueChar(s) {
 <section class="block" id="hash" data-search="Hash map Set JavaScript twoSum" data-stype="Section">
   <p class="kicker">The workhorse</p>
   <h2 class="section-title">Hash maps and sets</h2>
+  <p><a href="#gym-hash">Jump to hash / set practice (10 problems) →</a></p>
   {t1}
+  {hash_gym()}
 </section>
 '''

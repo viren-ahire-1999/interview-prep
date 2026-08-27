@@ -1,4 +1,5 @@
 from util import topic, diagram, callout, code
+from drills import lists_gym, stacks_gym
 
 
 def linked() -> str:
@@ -100,7 +101,9 @@ function removeNthFromEnd(head, n) {
 <section class="block" id="lists" data-search="Linked lists JavaScript" data-stype="Section">
   <p class="kicker">Pointers</p>
   <h2 class="section-title">Linked lists</h2>
+  <p><a href="#gym-lists">Jump to list practice (8 problems) →</a></p>
   {t1}{t2}
+  {lists_gym()}
 </section>
 '''
 
@@ -162,6 +165,8 @@ class MinStack {
 <section class="block" id="stacks" data-search="Stacks queues JavaScript" data-stype="Section">
   <p class="kicker">Ends of a list</p>
   <h2 class="section-title">Stacks and queues</h2>
+  <p><a href="#gym-stacks">Jump to stack / queue practice (8 problems) →</a></p>
   {t1}{t2}
+  {stacks_gym()}
 </section>
 '''

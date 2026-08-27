@@ -1,4 +1,5 @@
 from util import topic, diagram, callout, code
+from drills import graphs_gym
 
 
 def graphs() -> str:
@@ -87,6 +88,8 @@ DFS: stack/recursion — explore a path all the way""")}
 <section class="block" id="graphs" data-search="Graphs BFS DFS topology JavaScript" data-stype="Section">
   <p class="kicker">Networks</p>
   <h2 class="section-title">Graphs</h2>
+  <p><a href="#gym-graphs">Jump to graph practice (8 problems) →</a></p>
   {t1}{t2}{t3}
+  {graphs_gym()}
 </section>
 '''

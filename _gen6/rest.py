@@ -91,6 +91,7 @@ def progress() -> str:
 def readiness() -> str:
     groups = [
         ("From scratch", [
+            ("r-gym", "Finish 5+ problems in the Arrays gym and 5+ in the Hash gym to Solved"),
             ("r-arr", "Implement rotate-in-place and compact-remove without notes"),
             ("r-map", "Explain Map vs object vs Set and when each is wrong"),
             ("r-list", "Implement reverse, merge, and cycle detect on a list"),

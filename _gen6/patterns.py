@@ -1,4 +1,5 @@
 from util import topic, callout, code, diagram
+from drills import sort_gym, twopointer_gym, window_gym, backtrack_gym, dp_gym, expert_gym
 
 
 def sort_search() -> str:
@@ -46,7 +47,9 @@ function lowerBound(n, pred) {
 <section class="block" id="sort" data-search="Sorting binary search JavaScript" data-stype="Section">
   <p class="kicker">Order</p>
   <h2 class="section-title">Sorting and search</h2>
+  <p><a href="#gym-sort">Jump to sort / search practice (6 problems) →</a></p>
   {t}
+  {sort_gym()}
 </section>
 '''
 
@@ -88,7 +91,9 @@ function removeDuplicatesSorted(a) {
 <section class="block" id="twopointer" data-search="Two pointers JavaScript" data-stype="Section">
   <p class="kicker">Linear scan, smarter</p>
   <h2 class="section-title">Two pointers</h2>
+  <p><a href="#gym-twopointer">Jump to two-pointer practice (6 problems) →</a></p>
   {t}
+  {twopointer_gym()}
 </section>
 '''
 
@@ -124,7 +129,9 @@ function longestUnique(s) {
 <section class="block" id="window" data-search="Sliding window JavaScript" data-stype="Section">
   <p class="kicker">Subarrays in linear time</p>
   <h2 class="section-title">Sliding window</h2>
+  <p><a href="#gym-window">Jump to window practice (6 problems) →</a></p>
   {t}
+  {window_gym()}
 </section>
 '''
 
@@ -167,7 +174,9 @@ n! permutations — only tiny n""")}
 <section class="block" id="backtrack" data-search="Backtracking JavaScript" data-stype="Section">
   <p class="kicker">Exhaust, with a spine</p>
   <h2 class="section-title">Backtracking</h2>
+  <p><a href="#gym-backtrack">Jump to backtracking practice (6 problems) →</a></p>
   {t}
+  {backtrack_gym()}
 </section>
 '''
 
@@ -215,7 +224,9 @@ function knapsack(w, val, cap) {
 <section class="block" id="dp" data-search="Dynamic programming JavaScript" data-stype="Section">
   <p class="kicker">Optimal substructure</p>
   <h2 class="section-title">Dynamic programming</h2>
+  <p><a href="#gym-dp">Jump to DP practice (8 problems) →</a></p>
   {t1}
+  {dp_gym()}
 </section>
 '''
 
@@ -310,6 +321,8 @@ function dailyTemperatures(t) {
 <section class="block" id="expert" data-search="Trie union-find prefix monotonic stack" data-stype="Section">
   <p class="kicker">Expert structures</p>
   <h2 class="section-title">Tries, union-find, prefix, monotonic stack</h2>
+  <p><a href="#gym-expert">Jump to expert practice (8 problems) →</a></p>
   {t1}{t2}{t3}
+  {expert_gym()}
 </section>
 '''
