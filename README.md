@@ -10,6 +10,8 @@ To add a future company or topic: add a track in `index.html` (`TRACKS`), then r
 
 **Frontend System Design (expert course):** `frontend-system-design.html` — theory, 18 case studies, 24 design prompts, 80+ Q&A. Progress key: `fe-sd-v1`. Rebuild: `python3 _gen5/build.py`.
 
+**DSA using JavaScript (from scratch → expert):** `dsa-javascript.html` — implement structures in JS, patterns, practical studies, problem bank, Q&A. Progress key: `dsa-js-v1`. Rebuild: `python3 _gen6/build.py`.
+
 ---
 
 # Atlassian Senior SWE Interview Prep

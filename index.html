@@ -293,7 +293,7 @@
         eyebrow: "Deep skill",
         title: "Frontend System Design",
         meta: "Expert course · theory, cases, interview loop · about 28 days",
-        pill: "New",
+        pill: "Open",
         phases: [
           {
             n: "01",
@@ -302,6 +302,22 @@
             storageKey: "fe-sd-v1",
             blurb: "16-step framework, rendering to plugins, 18 case studies, 24 timed designs, 80+ Q&A, mocks.",
             tags: ["28 days", "Case studies", "Interview"]
+          }
+        ]
+      },
+      {
+        eyebrow: "Foundations",
+        title: "DSA using JavaScript",
+        meta: "From scratch → expert · implement, solve, apply · about 35 days",
+        pill: "New",
+        phases: [
+          {
+            n: "01",
+            title: "From scratch to expert",
+            href: "dsa-javascript.html",
+            storageKey: "dsa-js-v1",
+            blurb: "Build lists, heaps, graphs, tries in JavaScript, then patterns, a problem bank, practical studies, and mocks.",
+            tags: ["35 days", "JavaScript", "DSA"]
           }
         ]
       }
@@ -335,7 +351,7 @@
         const raw = localStorage.getItem(key);
         if (!raw) return false;
         const state = JSON.parse(raw);
-        const objects = ["checks", "topics", "jsTopics", "reactTopics", "questions", "problems", "readiness"];
+        const objects = ["checks", "topics", "jsTopics", "reactTopics", "questions", "problems", "designs", "exercises", "readiness"];
         const used = objects.some((k) => state[k] && Object.keys(state[k]).length > 0);
         return used || (Array.isArray(state.mocks) && state.mocks.length > 0);
       } catch {
