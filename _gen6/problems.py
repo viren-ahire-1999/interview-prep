@@ -1,8 +1,10 @@
-from util import esc, code
+from util import esc, code, solution_reveal
 
 
 def _p(i, title, level, cat, prompt, idea, src, time, space):
+    from explains import BANK
     hid = f"pb-{i}"
+    extra = BANK.get(i) or BANK.get(title)
     return f'''
 <article class="problem" id="{hid}" data-pid="{hid}" data-search="{esc(title)}" data-stype="Problem" data-cat="{cat}" data-level="{level}" data-mock="1" data-filterable>
   <div class="meta-row"><span class="badge badge-{level}">{level}</span><span class="chip">{cat}</span><span class="badge badge-pattern">Practice</span></div>
@@ -11,9 +13,7 @@ def _p(i, title, level, cat, prompt, idea, src, time, space):
   <p><button type="button" class="toggle-btn" data-toggle="{hid}-a">Reveal solution</button>
      <button type="button" class="toggle-btn" data-complete="designs" data-cid="{hid}">Mark complete</button></p>
   <div class="reveal" id="{hid}-a">
-    <p><b>Idea.</b> {idea}</p>
-    {code("JavaScript", src)}
-    <p><b>Time.</b> {time} &nbsp; <b>Space.</b> {space}</p>
+    {solution_reveal(hid, idea, src, time, space, extra)}
   </div>
   <div class="status-btns">
     <button type="button" data-status="not-started">Not Started</button>
@@ -276,7 +276,7 @@ def problems() -> str:
 <section class="block" id="problems" data-search="DSA JavaScript problem bank" data-stype="Section">
   <p class="kicker">{len(P)} problems · easy → hard</p>
   <h2 class="section-title">Problem bank</h2>
-  <p class="lede">Mixed interview order. Each structure already has a <b>Practice this topic</b> gym in its own section — use those first to get fluent, then come here. Solve on paper or in a scratch file. Reveal after you have an idea. Practice items — not claimed official questions. After this bank, grind Phase 1 for more volume.</p>
+  <p class="lede">Mixed interview order. Each structure already has a <b>Practice this topic</b> gym in its own section — use those first to get fluent, then come here. Solve on paper or in a scratch file. Reveal after you have an idea, then open <b>Explain solution</b> for the walkthrough. Practice items — not claimed official questions. After this bank, grind Phase 1 for more volume.</p>
   <div class="card" style="margin-bottom:16px">
     <p>Filter
       <select id="filter-status">

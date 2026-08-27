@@ -408,6 +408,7 @@
     $("#mock-pause") && $("#mock-pause").addEventListener("click", stopTimer);
     bindToggles(panel);
     bindCopy(panel);
+    bindTabs(panel);
   }
   function tick() {
     mockLeft = Math.max(0, mockLeft - 1);
@@ -483,25 +484,31 @@
     location.reload();
   });
 
-  $$(".tabs").forEach((wrap) => {
-    const group = wrap.getAttribute("data-tabs");
-    $$(".tab", wrap).forEach((tab) => {
-      tab.addEventListener("click", () => {
-        $$(".tab", wrap).forEach((t) => t.classList.remove("active"));
-        tab.classList.add("active");
-        const which = tab.getAttribute("data-tab");
-        if (group === "feq") {
-          $$(".q[data-level]").forEach((card) => {
-            card.classList.toggle("hidden", which !== "all" && card.getAttribute("data-level") !== which && card.getAttribute("data-cat") !== which);
+  function bindTabs(scope) {
+    $$(".tabs", scope || document).forEach((wrap) => {
+      if (wrap.dataset.boundTabs) return;
+      wrap.dataset.boundTabs = "1";
+      const group = wrap.getAttribute("data-tabs");
+      const root = wrap.parentElement || document;
+      $$(".tab", wrap).forEach((tab) => {
+        tab.addEventListener("click", () => {
+          $$(".tab", wrap).forEach((t) => t.classList.remove("active"));
+          tab.classList.add("active");
+          const which = tab.getAttribute("data-tab");
+          if (group === "feq") {
+            $$(".q[data-level]").forEach((card) => {
+              card.classList.toggle("hidden", which !== "all" && card.getAttribute("data-level") !== which && card.getAttribute("data-cat") !== which);
+            });
+            return;
+          }
+          $$("[data-tabpanel='" + group + "']", root).forEach((p) => {
+            p.classList.toggle("hidden", p.getAttribute("data-tab") !== which);
           });
-          return;
-        }
-        $$("[data-tabpanel='" + group + "']").forEach((p) => {
-          p.classList.toggle("hidden", p.getAttribute("data-tab") !== which);
         });
       });
     });
-  });
+  }
+  bindTabs(document);
 
   const navLinks = $$(".sidebar a[href^='#']");
   const sections = navLinks.map((a) => document.querySelector(a.getAttribute("href"))).filter(Boolean);

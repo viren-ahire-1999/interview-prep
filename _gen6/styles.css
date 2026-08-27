@@ -315,6 +315,10 @@ h2.section-title { font-size: 30px; letter-spacing: -0.03em; margin: 0 0 8px; }
 .topic h3, .pattern h3, .problem h3, .q h3, .ex h3 { margin-top: 0; }
 .meta-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
 
+.explain-sol { margin-top: 4px; }
+.explain-sol p { margin: 10px 0; }
+.sol-tabs { margin: 4px 0 12px; }
+
 .tabs { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0; }
 .tab {
   border: 1px solid var(--border);
