@@ -12,6 +12,8 @@ To add a future company or topic: add a track in `index.html` (`TRACKS`), then r
 
 **DSA using JavaScript (from scratch → expert):** `dsa-javascript.html` — implement structures in JS, patterns, practical studies, problem bank, Q&A. Progress key: `dsa-js-v1`. Rebuild: `python3 _gen6/build.py`.
 
+**AI Engineer (basics → production):** `ai-engineer.html` — foundations, classical ML, deep learning, RAG, agents, eval, safety, MLOps. Progress key: `ai-eng-v1`. Rebuild: `python3 _gen7/build.py`.
+
 ---
 
 # Atlassian Senior SWE Interview Prep
