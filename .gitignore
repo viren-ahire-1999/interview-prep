@@ -1,0 +1,6 @@
+.DS_Store
+.sf/
+.cursor/
+*.log
+__pycache__/
+*.pyc
