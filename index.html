@@ -253,6 +253,7 @@
         eyebrow: "Active",
         title: "Atlassian · Senior SWE",
         meta: "Senior Frontend / Full-stack · about 120 days",
+        pill: "Current",
         phases: [
           {
             n: "01",
@@ -285,6 +286,22 @@
             storageKey: "atl-phase4-v1",
             blurb: "Stories, values, mocks, the loop, and offer conversations.",
             tags: ["14 days", "Behavioral", "Mocks"]
+          }
+        ]
+      },
+      {
+        eyebrow: "Deep skill",
+        title: "Frontend System Design",
+        meta: "Expert course · theory, cases, interview loop · about 28 days",
+        pill: "New",
+        phases: [
+          {
+            n: "01",
+            title: "Expert course",
+            href: "frontend-system-design.html",
+            storageKey: "fe-sd-v1",
+            blurb: "16-step framework, rendering to plugins, 18 case studies, 24 timed designs, 80+ Q&A, mocks.",
+            tags: ["28 days", "Case studies", "Interview"]
           }
         ]
       }
@@ -337,7 +354,7 @@
             "<h3>" + track.title + "</h3>" +
             '<p class="meta">' + track.meta + "</p>" +
           "</div>" +
-          '<span class="pill">Current</span>' +
+          '<span class="pill">' + (track.pill || "Current") + "</span>" +
         "</div>" +
         '<div class="grid"></div>';
       const grid = el.querySelector(".grid");
