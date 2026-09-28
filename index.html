@@ -250,6 +250,23 @@
     /* Add future studies as another object in this array. */
     const TRACKS = [
       {
+        eyebrow: "Onboarding",
+        title: "Gotta learn before we start",
+        meta: "Observe UI · console plugins · 30 days",
+        pill: "Now",
+        phases: [
+          {
+            n: "01",
+            badge: "Guide",
+            title: "Gotta learn before we start",
+            href: "gotta-learn.html",
+            storageKey: "pre-start-v1",
+            blurb: "OpenShift console plugins, PatternFly 6, and metrics / logs / traces as one troubleshooting path — lessons, a 30-day plan, Q&A, and readiness.",
+            tags: ["30 days", "Observe UI", "Plugins"]
+          }
+        ]
+      },
+      {
         eyebrow: "Active",
         title: "Atlassian · Senior SWE",
         meta: "Senior Frontend / Full-stack · about 120 days",
@@ -325,7 +342,7 @@
         eyebrow: "Career path",
         title: "AI Engineer",
         meta: "Basics → production · about 42 days",
-        pill: "New",
+        pill: "Open",
         phases: [
           {
             n: "01",
@@ -397,7 +414,7 @@
         card.href = phase.href;
         card.innerHTML =
           '<div class="card-top">' +
-            '<span class="num">Phase ' + phase.n + "</span>" +
+            '<span class="num">' + (phase.badge || ("Phase " + phase.n)) + "</span>" +
             '<span class="status' + (started ? " on" : "") + '">In this browser</span>' +
           "</div>" +
           "<h4>" + phase.title + "</h4>" +

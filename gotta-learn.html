@@ -1,0 +1,2751 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Gotta learn before we start</title>
+  <meta name="description" content="A 30-day guide to OpenShift console plugins, PatternFly 6, and observability UI — metrics, logs, traces — before you join." />
+  <style>
+:root {
+  --bg: #0b0f14;
+  --bg-elevated: #121821;
+  --bg-card: #171e28;
+  --bg-hover: #1e2733;
+  --border: #2a3544;
+  --border-strong: #3d4d62;
+  --text: #e8eef4;
+  --text-muted: #93a1b1;
+  --text-dim: #6b7a8d;
+  --accent: #4c9aff;
+  --accent-hover: #79b8ff;
+  --accent-soft: rgba(76, 154, 255, 0.12);
+  --green: #57d9a3;
+  --green-soft: rgba(87, 217, 163, 0.12);
+  --yellow: #ffc400;
+  --yellow-soft: rgba(255, 196, 0, 0.12);
+  --red: #ff7452;
+  --red-soft: rgba(255, 116, 82, 0.12);
+  --purple: #c0b6f2;
+  --purple-soft: rgba(192, 182, 242, 0.12);
+  --sidebar-w: 272px;
+  --topbar-h: 52px;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --shadow: 0 8px 32px rgba(0, 0, 0, 0.28);
+  --font: "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --mono: "SF Mono", ui-monospace, Menlo, Consolas, "Liberation Mono", monospace;
+  --max: 980px;
+}
+
+[data-theme="light"] {
+  --bg: #f4f6f8;
+  --bg-elevated: #ffffff;
+  --bg-card: #ffffff;
+  --bg-hover: #eef2f6;
+  --border: #d5dde5;
+  --border-strong: #b8c4d0;
+  --text: #172b4d;
+  --text-muted: #44546f;
+  --text-dim: #6b778c;
+  --accent: #0052cc;
+  --accent-hover: #0747a6;
+  --accent-soft: rgba(0, 82, 204, 0.08);
+  --green: #1f845a;
+  --green-soft: rgba(31, 132, 90, 0.1);
+  --yellow: #974f0c;
+  --yellow-soft: rgba(151, 79, 12, 0.1);
+  --red: #c9372c;
+  --red-soft: rgba(201, 55, 44, 0.1);
+  --purple: #5e4db2;
+  --purple-soft: rgba(94, 77, 178, 0.1);
+  --shadow: 0 8px 28px rgba(23, 43, 77, 0.08);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 72px; }
+body {
+  margin: 0;
+  display: flex;
+  min-height: 100vh;
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.65;
+  font-size: 15.5px;
+}
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+img, svg { max-width: 100%; }
+button, input, select, textarea { font: inherit; color: inherit; }
+
+.app { display: flex; min-height: 100vh; }
+
+.sidebar {
+  position: sticky;
+  top: 0;
+  width: var(--sidebar-w);
+  height: 100vh;
+  overflow: auto;
+  background: var(--bg-elevated);
+  border-right: 1px solid var(--border);
+  padding: 20px 14px 80px;
+  flex-shrink: 0;
+  z-index: 20;
+}
+body.nav-collapsed .sidebar {
+  display: none;
+}
+.brand {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 4px 8px 16px;
+}
+.brand > div:nth-child(2) { flex: 1; min-width: 0; }
+.sidebar-hide {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+}
+.brand-mark {
+  width: 36px; height: 36px;
+  border-radius: 9px;
+  background: linear-gradient(135deg, #0052cc, #4c9aff);
+  display: grid; place-items: center;
+  color: #fff; font-weight: 800;
+}
+.brand h1 { font-size: 14px; margin: 0; letter-spacing: -0.02em; }
+.brand p { margin: 2px 0 0; font-size: 11px; color: var(--text-muted); }
+
+.search-wrap { position: relative; margin: 0 6px 16px; }
+.search-wrap input {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 9px 12px 9px 34px;
+  outline: none;
+}
+.search-wrap input:focus { border-color: var(--accent); }
+.search-wrap svg {
+  position: absolute; left: 10px; top: 11px;
+  width: 16px; height: 16px; color: var(--text-dim);
+}
+.search-results {
+  display: none;
+  position: absolute;
+  left: 0; right: 0; top: 42px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  max-height: 360px;
+  overflow: auto;
+  box-shadow: var(--shadow);
+  z-index: 40;
+}
+.search-results.open { display: block; }
+.search-results a {
+  display: block;
+  padding: 8px 12px;
+  color: var(--text);
+  text-decoration: none;
+  border-bottom: 1px solid var(--border);
+}
+.search-results a:hover { background: var(--bg-hover); }
+.search-results small { display: block; color: var(--text-dim); font-size: 11px; }
+
+.nav-group { margin-bottom: 14px; }
+.nav-group h2 {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-dim);
+  margin: 0 8px 6px;
+}
+.nav-group a {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  border-radius: 8px;
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 13.5px;
+}
+.nav-group a:hover, .nav-group a.active {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.main { flex: 1; min-width: 0; }
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 15;
+  height: var(--topbar-h);
+  background: color-mix(in srgb, var(--bg) 86%, transparent);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 24px;
+}
+.menu-btn {
+  display: inline-grid;
+  place-items: center;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 6px 10px;
+  cursor: pointer;
+}
+.hub-link {
+  flex-shrink: 0;
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 650;
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  white-space: nowrap;
+}
+.hub-link:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+  text-decoration: none;
+}
+.overall-wrap { flex: 1; }
+.overall-label {
+  display: flex; justify-content: space-between;
+  font-size: 12px; color: var(--text-muted); margin-bottom: 4px;
+}
+.bar {
+  height: 8px; background: var(--bg-hover); border-radius: 99px; overflow: hidden;
+}
+.bar > span {
+  display: block; height: 100%; width: 0;
+  background: linear-gradient(90deg, var(--accent), var(--green));
+  transition: width 0.35s ease;
+}
+.icon-btn {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  width: 36px; height: 36px;
+  display: grid; place-items: center;
+  cursor: pointer;
+}
+.icon-btn:hover { border-color: var(--accent); }
+
+.content { max-width: var(--max); margin: 0 auto; padding: 32px 28px 120px; }
+section.block { margin-bottom: 72px; scroll-margin-top: 72px; }
+
+.kicker {
+  font-size: 12px; font-weight: 700; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--accent); margin: 0 0 8px;
+}
+h2.section-title { font-size: 30px; letter-spacing: -0.03em; margin: 0 0 8px; }
+.lede { color: var(--text-muted); font-size: 16px; margin: 0 0 24px; }
+
+.grid { display: grid; gap: 14px; }
+.grid-2 { grid-template-columns: 1fr 1fr; }
+.grid-3 { grid-template-columns: repeat(3, 1fr); }
+.grid-4 { grid-template-columns: repeat(4, 1fr); }
+
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px;
+}
+.card h3 { margin: 0 0 8px; font-size: 16px; }
+.stat {
+  font-size: 28px; font-weight: 750; letter-spacing: -0.03em;
+}
+.stat-sub { color: var(--text-muted); font-size: 13px; }
+
+.badge {
+  display: inline-flex; align-items: center;
+  padding: 2px 8px; border-radius: 999px;
+  font-size: 11px; font-weight: 700; letter-spacing: 0.03em;
+}
+.badge-easy { background: var(--green-soft); color: var(--green); }
+.badge-medium { background: var(--yellow-soft); color: var(--yellow); }
+.badge-hard { background: var(--red-soft); color: var(--red); }
+.badge-pattern { background: var(--accent-soft); color: var(--accent); }
+.badge-js { background: var(--purple-soft); color: var(--purple); }
+.badge-opt { background: var(--bg-hover); color: var(--text-muted); }
+
+.profile-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 0; }
+.chip {
+  background: var(--bg-hover);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.day {
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  margin-bottom: 12px;
+  overflow: hidden;
+}
+.day-head {
+  width: 100%;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; padding: 14px 16px;
+  background: transparent; border: 0; cursor: pointer; text-align: left;
+}
+.day-head h3 { margin: 0; font-size: 16px; }
+.day-meta { color: var(--text-muted); font-size: 13px; }
+.day-body { display: none; padding: 0 16px 16px; border-top: 1px solid var(--border); }
+.day.open .day-body { display: block; }
+.task {
+  display: flex; gap: 10px; align-items: flex-start;
+  padding: 8px 0; border-bottom: 1px dashed var(--border);
+}
+.task:last-child { border-bottom: 0; }
+.task input { margin-top: 5px; accent-color: var(--accent); }
+.task b { display: block; font-size: 12px; color: var(--accent); text-transform: uppercase; letter-spacing: 0.04em; }
+
+.topic, .pattern, .problem, .q, .ex, .elq {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 16px;
+}
+.topic h3, .pattern h3, .problem h3, .q h3, .ex h3 { margin-top: 0; }
+.meta-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+
+.tabs { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0; }
+.tab {
+  border: 1px solid var(--border);
+  background: var(--bg);
+  border-radius: 999px;
+  padding: 5px 12px;
+  cursor: pointer;
+  color: var(--text-muted);
+}
+.tab.active { background: var(--accent-soft); color: var(--accent); border-color: transparent; }
+
+.code-block {
+  margin: 12px 0;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  background: #0a0e13;
+}
+[data-theme="light"] .code-block { background: #1b2430; }
+.code-head {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 6px 10px;
+  background: #111821;
+  color: #9fb0c3;
+  font-size: 12px;
+}
+.copy-btn {
+  background: transparent; border: 1px solid #2a3544;
+  color: #c5d0dc; border-radius: 6px; padding: 2px 8px; cursor: pointer;
+}
+.copy-btn:hover { border-color: #4c9aff; }
+pre {
+  margin: 0; padding: 14px 16px; overflow: auto;
+  font-family: var(--mono); font-size: 13px; line-height: 1.55;
+  color: #d6deea;
+}
+.callout {
+  border-left: 3px solid var(--accent);
+  background: var(--accent-soft);
+  padding: 12px 14px;
+  border-radius: 0 10px 10px 0;
+  margin: 12px 0;
+}
+.callout.warn { border-color: var(--yellow); background: var(--yellow-soft); }
+.callout.good { border-color: var(--green); background: var(--green-soft); }
+.callout.bad { border-color: var(--red); background: var(--red-soft); }
+
+.diagram {
+  font-family: var(--mono);
+  font-size: 12px;
+  line-height: 1.35;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px;
+  overflow: auto;
+  white-space: pre;
+  color: var(--text-muted);
+}
+
+.status-btns { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+.status-btns button {
+  border: 1px solid var(--border);
+  background: var(--bg);
+  border-radius: 8px;
+  padding: 5px 10px;
+  cursor: pointer;
+  font-size: 12px;
+}
+.status-btns button.active-not-started { background: var(--bg-hover); }
+.status-btns button.active-attempted { background: var(--yellow-soft); color: var(--yellow); }
+.status-btns button.active-solved { background: var(--green-soft); color: var(--green); }
+.status-btns button.active-review { background: var(--accent-soft); color: var(--accent); }
+.status-btns button.active-mastered { background: var(--purple-soft); color: var(--purple); }
+
+.reveal { display: none; margin-top: 10px; }
+.reveal.open { display: block; }
+.toggle-btn {
+  background: var(--accent-soft); color: var(--accent);
+  border: 0; border-radius: 8px; padding: 6px 12px; cursor: pointer;
+}
+.toggle-btn.done {
+  background: var(--green-soft); color: var(--green);
+}
+.adr { border-left: 3px solid var(--purple); }
+.flow {
+  display: grid; gap: 8px;
+  font-size: 13px;
+}
+.flow-step {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+.glossary-grid { display: grid; gap: 10px; }
+.clue { background: var(--bg); border: 1px dashed var(--border-strong); border-radius: 8px; padding: 10px; margin: 8px 0; }
+.tooltip { border-bottom: 1px dotted var(--text-dim); cursor: help; }
+.vis-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: stretch; }
+.vis-box {
+  flex: 1; min-width: 110px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px;
+  font-size: 12px;
+  text-align: center;
+}
+.vis-arrow { align-self: center; color: var(--accent); font-weight: 700; }
+
+.filters { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 18px; }
+.filters select, .filters input {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 7px 10px;
+}
+
+.hidden { display: none !important; }
+
+table {
+  width: 100%; border-collapse: collapse; font-size: 14px; margin: 12px 0;
+}
+th, td {
+  border: 1px solid var(--border);
+  padding: 8px 10px;
+  text-align: left;
+  vertical-align: top;
+}
+th { background: var(--bg-hover); font-size: 12px; color: var(--text-muted); }
+
+.back-top {
+  position: fixed; right: 20px; bottom: 20px;
+  width: 42px; height: 42px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  display: grid; place-items: center;
+}
+.sidebar-backdrop {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.45);
+  z-index: 19;
+}
+
+ul.tight, ol.tight { margin: 8px 0 8px 18px; padding: 0; }
+ul.tight li, ol.tight li { margin: 4px 0; }
+
+.comm-step {
+  display: grid;
+  grid-template-columns: 36px 1fr;
+  gap: 12px;
+  margin: 14px 0;
+}
+.comm-num {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: var(--accent-soft); color: var(--accent);
+  display: grid; place-items: center; font-weight: 700;
+}
+
+.say {
+  background: var(--bg);
+  border: 1px dashed var(--border-strong);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-style: italic;
+  color: var(--text-muted);
+}
+
+#mock-panel { min-height: 200px; }
+.timer {
+  font-size: 42px; font-weight: 750; font-variant-numeric: tabular-nums;
+  letter-spacing: -0.04em;
+}
+.danger-btn {
+  background: var(--red-soft); color: var(--red);
+  border: 1px solid transparent; border-radius: 8px; padding: 8px 14px; cursor: pointer;
+}
+
+@media (max-width: 980px) {
+  .grid-4 { grid-template-columns: 1fr 1fr; }
+  .grid-3 { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 800px) {
+  body { display: block; }
+  body.nav-collapsed .sidebar { display: block; }
+  .sidebar {
+    position: fixed; left: 0; transform: translateX(-100%);
+    transition: transform 0.2s ease;
+  }
+  .sidebar.open { transform: translateX(0); }
+  .sidebar-backdrop.open { display: block; }
+  .sidebar-hide { display: none; }
+  .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+  .content { padding: 20px 16px 100px; }
+}
+
+  </style>
+</head>
+<body>
+<div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+<aside class="sidebar" id="sidebar">
+  <div class="brand">
+    <div class="brand-mark">GL</div>
+    <div>
+      <h1>Before we start</h1>
+      <p>30 days · Observe UI</p>
+    </div>
+    <button type="button" class="icon-btn sidebar-hide" id="sidebar-hide" title="Hide sidebar" aria-label="Hide sidebar">«</button>
+  </div>
+  <div class="search-wrap">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3-3"/></svg>
+    <input id="global-search" type="search" placeholder="Search plugins, PromQL, Perses..." autocomplete="off" />
+    <div class="search-results" id="search-results"></div>
+  </div>
+  <nav>
+    <div class="nav-group">
+      <h2>Library</h2>
+      <a href="index.html">All prep</a>
+    </div>
+    <div class="nav-group">
+      <h2>Start</h2>
+      <a href="#dashboard">Dashboard</a>
+      <a href="#howto">How to use</a>
+      <a href="#plan">30-Day Plan</a>
+      <a href="#role">The job</a>
+    </div>
+    <div class="nav-group">
+      <h2>The system</h2>
+      <a href="#observe">Observe surfaces</a>
+      <a href="#plugins">Console plugins</a>
+      <a href="#patternfly">PatternFly 6</a>
+      <a href="#signals">Three signals</a>
+      <a href="#queries">Query languages</a>
+      <a href="#perses">Perses</a>
+      <a href="#korrel8r">Correlation</a>
+    </div>
+    <div class="nav-group">
+      <h2>How you work</h2>
+      <a href="#tools">Tools</a>
+      <a href="#repos">Repos to clone</a>
+      <a href="#skip">Do not over-invest</a>
+      <a href="#senior">Senior behaviors</a>
+    </div>
+    <div class="nav-group">
+      <h2>Practice</h2>
+      <a href="#practical">Practical studies</a>
+      <a href="#feq">Q&amp;A</a>
+      <a href="#drills">Exercises</a>
+      <a href="#mock">Teach-back</a>
+    </div>
+    <div class="nav-group">
+      <h2>Track</h2>
+      <a href="#readiness">Readiness</a>
+      <a href="#progress">Progress</a>
+      <a href="#glossary">Glossary</a>
+      <a href="#resources">Resources</a>
+    </div>
+  </nav>
+</aside>
+<div class="main">
+  <header class="topbar">
+    <button class="menu-btn" id="menu-btn" type="button" aria-label="Toggle sidebar">☰</button>
+    <a class="hub-link" href="index.html">All prep</a>
+    <div class="overall-wrap">
+      <div class="overall-label"><span>Before we start</span><strong id="overall-pct">0%</strong></div>
+      <div class="bar"><span id="overall-bar"></span></div>
+    </div>
+    <button class="icon-btn" id="theme-toggle" type="button" title="Toggle theme" aria-label="Toggle theme">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+    </button>
+  </header>
+  <main class="content">
+
+<section class="block" id="dashboard" data-search="Gotta learn before we start dashboard" data-stype="Section">
+  <p class="kicker">30 days · OpenShift Observe UI</p>
+  <h2 class="section-title">Gotta learn before we start</h2>
+  <p class="lede">You already know React and TypeScript. The extra edge is not another framework. It is speaking <b>Observe</b> the way this team ships it: OpenShift <b>console dynamic plugins</b>, <b>PatternFly 6</b>, and turning <b>metrics, logs, and traces</b> into one troubleshooting path — then landing that in <b>upstream GitHub</b>.</p>
+
+  <div class="card" style="margin-bottom:16px">
+    <h3>What “ready” means here</h3>
+    <div class="profile-row">
+      <span class="chip">Console plugins</span>
+      <span class="chip">PatternFly 6</span>
+      <span class="chip">PromQL / LogQL / TraceQL</span>
+      <span class="chip">Perses</span>
+      <span class="chip">Korrel8r</span>
+      <span class="chip">Accessibility</span>
+    </div>
+    <p class="stat-sub" style="margin-top:12px">This is a 30-day onboarding guide for an observability UI lead role on OpenShift. You sit between backend signal teams, product, and UX. You do not need to write operators. You do need to read YAML, query three backends, and review plugin PRs like a senior.</p>
+  </div>
+
+  <div class="grid grid-2" style="margin-bottom:16px">
+    <div class="card">
+      <h3>You will be able to</h3>
+      <ul class="tight">
+        <li>Explain a ConsolePlugin and a UIPlugin CR</li>
+        <li>Build UI that looks like PatternFly 6, not a SaaS dashboard</li>
+        <li>Say why plugins must not import PatternFly CSS</li>
+        <li>Pick the right signal: metric vs log vs trace</li>
+        <li>Write a useful PromQL and a useful LogQL</li>
+        <li>Follow one request through OpenTelemetry into Tempo</li>
+        <li>Sketch Korrel8r: alert → related logs, metrics, pods</li>
+        <li>Talk empty / error / partial-query states with backend</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>How to use this file</h3>
+      <ol class="tight">
+        <li>Open the <b>30-Day Plan</b>. Check every box.</li>
+        <li>Read one lesson. Say the idea out loud before the code.</li>
+        <li>Do the week’s install or clone, not only the reading.</li>
+        <li>Leave when Readiness is honestly ~85% and you can teach the plugin loop without notes.</li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="grid grid-3">
+    <div class="card"><div class="stat-sub">Days / daily tasks</div><div class="stat" id="stat-days">0%</div><div class="bar"><span id="bar-days"></span></div></div>
+    <div class="card"><div class="stat-sub">Lessons</div><div class="stat" id="stat-arch">0%</div><div class="bar"><span id="bar-arch"></span></div></div>
+    <div class="card"><div class="stat-sub">Practical studies</div><div class="stat" id="stat-react">0%</div><div class="bar"><span id="bar-react"></span></div></div>
+    <div class="card"><div class="stat-sub">Q&amp;A</div><div class="stat" id="stat-qs">0 / 0</div><div class="bar"><span id="bar-qs"></span></div></div>
+    <div class="card"><div class="stat-sub">Exercises</div><div class="stat" id="stat-sd">0 / 0</div><div class="bar"><span id="bar-sd"></span></div></div>
+    <div class="card"><div class="stat-sub">Mock interviews</div><div class="stat" id="stat-mocks">0</div><p class="stat-sub">Optional</p></div>
+    <div class="card"><div class="stat-sub">Overall readiness</div><div class="stat" id="stat-ready">0%</div><div class="bar"><span id="bar-ready"></span></div></div>
+    <div class="card"><div class="stat-sub">Items to review</div><div class="stat" id="stat-review">0</div></div>
+    <div class="card"><div class="stat-sub">Drills</div><div class="stat" id="stat-ex">0 / 0</div><div class="bar"><span id="bar-ex"></span></div></div>
+  </div>
+  <div class="callout" style="margin-top:18px">
+    <b>Progress.</b> <code>localStorage</code> key <code>pre-start-v1</code> on this browser only. Separate from DSA, AI Engineer, and Atlassian phases.
+  </div>
+</section>
+
+<section class="block" id="howto" data-search="How to use this 30 day guide" data-stype="Section">
+  <p class="kicker">Method</p>
+  <h2 class="section-title">How to use this</h2>
+  
+<article class="topic" id="ht-edge" data-search="how to use this 30 day guide" data-stype="Lesson">
+  <h3>Four things beat reading every repo</h3>
+  
+  <p>You will not finish every plugin repository. Finish a loop you can demonstrate:</p>
+  <ol>
+    <li><b>Plugin template running</b> against a cluster (or the documented local console container).</li>
+    <li><b>Three PatternFly 6 screens</b> that work keyboard-only and pass a basic axe pass.</li>
+    <li><b>One request followed</b> across metrics, logs, and traces (OpenTelemetry demo is enough).</li>
+    <li><b>A written correlation story</b> from “pod CrashLooping” to the Observe pages.</li>
+  </ol>
+  <div class="callout"><b>Tools vs job.</b> Webpack, Yarn, and <code>oc</code> are the daily loop. Tailwind and a new chart library are not. The console already owns PatternFly CSS.</div>
+  <p>Internal CI, Jira, and downstream branches wait until you have accounts. Everything in this file is public.</p>
+  
+  <p><button type="button" class="toggle-btn" data-complete="topics" data-cid="ht-edge">Mark complete</button></p>
+</article>
+
+</section>
+
+<section class="block" id="plan" data-search="30-Day plan before we start" data-stype="Section">
+  <p class="kicker">Schedule</p>
+  <h2 class="section-title">30-Day plan</h2>
+  <p class="lede">Six days a week is enough. If you miss a day, finish the concept + one install step — do not binge three plugin repos. GPU not required. A laptop, <code>oc</code>, and a throwaway cluster (or CRC) is the luxury version.</p>
+  <div class="card" style="margin-bottom:16px">
+    <h3>Daily cadence</h3>
+    <table>
+      <tr><th>Time</th><th>Block</th><th>Rule</th></tr>
+      <tr><td>10 min</td><td>Revision</td><td>Yesterday’s definition from memory.</td></tr>
+      <tr><td>45 min</td><td>Lesson</td><td>Read until you can teach the diagram.</td></tr>
+      <tr><td>45 min</td><td>Do</td><td>Install, clone, query, or sketch.</td></tr>
+      <tr><td>20 min</td><td>Verbal</td><td>Product example + what you would not build.</td></tr>
+    </table>
+  </div>
+  <article class="day" id="gl-day-1">
+  <button type="button" class="day-head">
+    <div>
+      <h3>Day 1 — How to use + the job</h3>
+      <div class="day-meta">~2 hours · read, then make something small</div>
+    </div>
+    <span class="badge badge-pattern">Day 1</span>
+  </button>
+  <div class="day-body"><label class="task"><input type="checkbox" data-id="d1-rev" data-group="checks" /><span><b>Revision</b> None — day 1.</span></label><label class="task"><input type="checkbox" data-id="d1-learn" data-group="checks" /><span><b>Concept</b> How to use this and The job. You are the UI catalyst.</span></label><label class="task"><input type="checkbox" data-id="d1-do" data-group="checks" /><span><b>Exercise</b> Write 8 lines: a product you know, where Observe would help, what must stay a backend contract.</span></label><label class="task"><input type="checkbox" data-id="d1-verbal" data-group="checks" /><span><b>Verbal</b> What does this role own that a backend metrics engineer does not?</span></label></div>
+</article><article class="day" id="gl-day-2">
+  <button type="button" class="day-head">
+    <div>
+      <h3>Day 2 — Observe surfaces</h3>
+      <div class="day-meta">~2 hours · read, then make something small</div>
+    </div>
+    <span class="badge badge-pattern">Day 2</span>
+  </button>
+  <div class="day-body"><label class="task"><input type="checkbox" data-id="d2-rev" data-group="checks" /><span><b>Revision</b> The job.</span></label><label class="task"><input type="checkbox" data-id="d2-learn" data-group="checks" /><span><b>Concept</b> Metrics, logs, traces, Perses, troubleshooting panel, incidents.</span></label><label class="task"><input type="checkbox" data-id="d2-do" data-group="checks" /><span><b>Exercise</b> Draw the Observe menu from memory. Label the backend for each item.</span></label><label class="task"><input type="checkbox" data-id="d2-verbal" data-group="checks" /><span><b>Verbal</b> CMO vs COO in one minute.</span></label></div>
+</article><article class="day" id="gl-day-3">
+  <button type="button" class="day-head">
+    <div>
+      <h3>Day 3 — Kubernetes enough to debug</h3>
+      <div class="day-meta">~2 hours · read, then make something small</div>
+    </div>
+    <span class="badge badge-pattern">Day 3</span>
+  </button>
+  <div class="day-body"><label class="task"><input type="checkbox" data-id="d3-rev" data-group="checks" /><span><b>Revision</b> Observe surfaces.</span></label><label class="task"><input type="checkbox" data-id="d3-learn" data-group="checks" /><span><b>Concept</b> Namespace, Service, Route, RBAC, CRD. Why dashboards are namespaced.</span></label><label class="task"><input type="checkbox" data-id="d3-do" data-group="checks" /><span><b>Exercise</b> Install oc and kubectl. Run oc help. Read a UIPlugin YAML example in this file.</span></label><label class="task"><input type="checkbox" data-id="d3-verbal" data-group="checks" /><span><b>Verbal</b> Why would a GitOps Console spec wipe a plugin?</span></label></div>
+</article><article class="day" id="gl-day-4">
+  <button type="button" class="day-head">
+    <div>
+      <h3>Day 4 — PromQL start</h3>
+      <div class="day-meta">~2 hours · read, then make something small</div>
+    </div>
+    <span class="badge badge-pattern">Day 4</span>
+  </button>
+  <div class="day-body"><label class="task"><input type="checkbox" data-id="d4-rev" data-group="checks" /><span><b>Revision</b> RBAC one-liner.</span></label><label class="task"><input type="checkbox" data-id="d4-learn" data-group="checks" /><span><b>Concept</b> rate, increase, histogram_quantile, by/without. Instant vs range.</span></label><label class="task"><input type="checkbox" data-id="d4-do" data-group="checks" /><span><b>Exercise</b> Stand up Prometheus (kind + kube-prometheus-stack or a local binary). Write 5 queries.</span></label><label class="task"><input type="checkbox" data-id="d4-verbal" data-group="checks" /><span><b>Verbal</b> When is rate() wrong?</span></label></div>
+</article><article class="day" id="gl-day-5">
+  <button type="button" class="day-head">
+    <div>
+      <h3>Day 5 — Three signals</h3>
+      <div class="day-meta">~2 hours · read, then make something small</div>
+    </div>
+    <span class="badge badge-pattern">Day 5</span>
+  </button>
+  <div class="day-body"><label class="task"><input type="checkbox" data-id="d5-rev" data-group="checks" /><span><b>Revision</b> PromQL five queries.</span></label><label class="task"><input type="checkbox" data-id="d5-learn" data-group="checks" /><span><b>Concept</b> Metric vs log vs trace. When each is the starting point.</span></label><label class="task"><input type="checkbox" data-id="d5-do" data-group="checks" /><span><b>Exercise</b> For CrashLoop, high latency, and a 500 error — pick the first signal and the second.</span></label><label class="task"><input type="checkbox" data-id="d5-verbal" data-group="checks" /><span><b>Verbal</b> Why is a trace not a substitute for a metric?</span></label></div>
+</article><article class="day" id="gl-day-6">
+  <button type="button" class="day-head">
+    <div>
+      <h3>Day 6 — Console plugin model</h3>
+      <div class="day-meta">~2 hours · read, then make something small</div>
+    </div>
+    <span class="badge badge-pattern">Day 6</span>
+  </button>
+  <div class="day-body"><label class="task"><input type="checkbox" data-id="d6-rev" data-group="checks" /><span><b>Revision</b> Three signals.</span></label><label class="task"><input type="checkbox" data-id="d6-learn" data-group="checks" /><span><b>Concept</b> Webpack 5 federation, ConsolePlugin CR, spec.plugins, spec.proxy.</span></label><label class="task"><input type="checkbox" data-id="d6-do" data-group="checks" /><span><b>Exercise</b> Clone console-plugin-template. Read package.json consolePlugin and console-extensions.json.</span></label><label class="task"><input type="checkbox" data-id="d6-verbal" data-group="checks" /><span><b>Verbal</b> What does the console Operator spec.plugins list do?</span></label></div>
+</article><article class="day" id="gl-day-7">
+  <button type="button" class="day-head">
+    <div>
+      <h3>Day 7 — Local plugin loop</h3>
+      <div class="day-meta">~2 hours · read, then make something small</div>
+    </div>
+    <span class="badge badge-pattern">Day 7</span>
+  </button>
+  <div class="day-body"><label class="task"><input type="checkbox" data-id="d7-rev" data-group="checks" /><span><b>Revision</b> ConsolePlugin YAML.</span></label><label class="task"><input type="checkbox" data-id="d7-learn" data-group="checks" /><span><b>Concept</b> Yarn, podman/docker, start-console, plugin assets via /api/plugins/.</span></label><label class="task"><input type="checkbox" data-id="d7-do" data-group="checks" /><span><b>Exercise</b> Get the template README loop as far as your machine allows. Note blockers.</span></label><label class="task"><input type="checkbox" data-id="d7-verbal" data-group="checks" /><span><b>Verbal</b> Why Webpack 5, not Vite, for these plugins?</span></label></div>
+</article><article class="day" id="gl-day-8">
+  <button type="button" class="day-head">
+    <div>
+      <h3>Day 8 — PatternFly 6</h3>
+      <div class="day-meta">~2 hours · read, then make something small</div>
+    </div>
+    <span class="badge badge-pattern">Day 8</span>
+  </button>
+  <div class="day-body"><label class="task"><input type="checkbox" data-id="d8-rev" data-group="checks" /><span><b>Revision</b> Plugin loop.</span></label><label class="task"><input type="checkbox" data-id="d8-learn" data-group="checks" /><span><b>Concept</b> OCP 4.19+ is PF 6. No Tailwind. No PF CSS imports in the plugin.</span></label><label class="task"><input type="checkbox" data-id="d8-do" data-group="checks" /><span><b>Exercise</b> Build a filterable table and a form in PF 6. Keyboard only.</span></label><label class="task"><input type="checkbox" data-id="d8-verbal" data-group="checks" /><span><b>Verbal</b> Why must you not import @patternfly/patternfly CSS?</span></label></div>
+</article><article class="day" id="gl-day-9">
+  <button type="button" class="day-head">
+    <div>
+      <h3>Day 9 — Accessibility as a ship gate</h3>
+      <div class="day-meta">~2 hours · read, then make something small</div>
+    </div>
+    <span class="badge badge-pattern">Day 9</span>
+  </button>
+  <div class="day-body"><label class="task"><input type="checkbox" data-id="d9-rev" data-group="checks" /><span><b>Revision</b> PF class prefixing.</span></label><label class="task"><input type="checkbox" data-id="d9-learn" data-group="checks" /><span><b>Concept</b> WCAG 2.2 AA in practice. Charts not color-only. Live regions.</span></label><label class="task"><input type="checkbox" data-id="d9-do" data-group="checks" /><span><b>Exercise</b> axe DevTools on your PF screens. Fix the first five issues.</span></label><label class="task"><input type="checkbox" data-id="d9-verbal" data-group="checks" /><span><b>Verbal</b> Name two PF components that help a11y if you use them correctly.</span></label></div>
+</article><article class="day" id="gl-day-10">
+  <button type="button" class="day-head">
+    <div>
+      <h3>Day 10 — monitoring-plugin skim</h3>
+      <div class="day-meta">~2 hours · read, then make something small</div>
+    </div>
+    <span class="badge badge-pattern">Day 10</span>
+  </button>
+  <div class="day-body"><label class="task"><input type="checkbox" data-id="d10-rev" data-group="checks" /><span><b>Revision</b> a11y fixes.</span></label><label class="task"><input type="checkbox" data-id="d10-learn" data-group="checks" /><span><b>Concept</b> CMO features vs COO features. ACM alerts, Perses, incidents.</span></label><label class="task"><input type="checkbox" data-id="d10-do" data-group="checks" /><span><b>Exercise</b> Read the README. List extension points you see.</span></label><label class="task"><input type="checkbox" data-id="d10-verbal" data-group="checks" /><span><b>Verbal</b> What is a feature flag doing in this plugin?</span></label></div>
+</article><article class="day" id="gl-day-11">
+  <button type="button" class="day-head">
+    <div>
+      <h3>Day 11 — LogQL</h3>
+      <div class="day-meta">~2 hours · read, then make something small</div>
+    </div>
+    <span class="badge badge-pattern">Day 11</span>
+  </button>
+  <div class="day-body"><label class="task"><input type="checkbox" data-id="d11-rev" data-group="checks" /><span><b>Revision</b> monitoring-plugin flags.</span></label><label class="task"><input type="checkbox" data-id="d11-learn" data-group="checks" /><span><b>Concept</b> Stream selectors, line filters, JSON, metric queries from logs.</span></label><label class="task"><input type="checkbox" data-id="d11-do" data-group="checks" /><span><b>Exercise</b> Run Loki or read LogQL docs with a sample log line. Write 5 queries.</span></label><label class="task"><input type="checkbox" data-id="d11-verbal" data-group="checks" /><span><b>Verbal</b> viaq vs OTel log schema — why does the UI care?</span></label></div>
+</article><article class="day" id="gl-day-12">
+  <button type="button" class="day-head">
+    <div>
+      <h3>Day 12 — OpenTelemetry demo</h3>
+      <div class="day-meta">~2 hours · read, then make something small</div>
+    </div>
+    <span class="badge badge-pattern">Day 12</span>
+  </button>
+  <div class="day-body"><label class="task"><input type="checkbox" data-id="d12-rev" data-group="checks" /><span><b>Revision</b> LogQL.</span></label><label class="task"><input type="checkbox" data-id="d12-learn" data-group="checks" /><span><b>Concept</b> span, resource, service.name, collector pipelines.</span></label><label class="task"><input type="checkbox" data-id="d12-do" data-group="checks" /><span><b>Exercise</b> Run the OTel demo (or watch a recorded walkthrough and take notes if you cannot run it). Follow one checkout.</span></label><label class="task"><input type="checkbox" data-id="d12-verbal" data-group="checks" /><span><b>Verbal</b> Collector vs SDK vs backend.</span></label></div>
+</article><article class="day" id="gl-day-13">
+  <button type="button" class="day-head">
+    <div>
+      <h3>Day 13 — Tempo and TraceQL</h3>
+      <div class="day-meta">~2 hours · read, then make something small</div>
+    </div>
+    <span class="badge badge-pattern">Day 13</span>
+  </button>
+  <div class="day-body"><label class="task"><input type="checkbox" data-id="d13-rev" data-group="checks" /><span><b>Revision</b> OTel demo.</span></label><label class="task"><input type="checkbox" data-id="d13-learn" data-group="checks" /><span><b>Concept</b> TempoStack. Trace search vs Jaeger-as-product (legacy in talks).</span></label><label class="task"><input type="checkbox" data-id="d13-do" data-group="checks" /><span><b>Exercise</b> Skim distributed-tracing-console-plugin README / AGENTS.md.</span></label><label class="task"><input type="checkbox" data-id="d13-verbal" data-group="checks" /><span><b>Verbal</b> Why does that plugin have a Go backend?</span></label></div>
+</article><article class="day" id="gl-day-14">
+  <button type="button" class="day-head">
+    <div>
+      <h3>Day 14 — Timeseries UI performance</h3>
+      <div class="day-meta">~2 hours · read, then make something small</div>
+    </div>
+    <span class="badge badge-pattern">Day 14</span>
+  </button>
+  <div class="day-body"><label class="task"><input type="checkbox" data-id="d14-rev" data-group="checks" /><span><b>Revision</b> TraceQL.</span></label><label class="task"><input type="checkbox" data-id="d14-learn" data-group="checks" /><span><b>Concept</b> Abort in-flight queries, resolution/step, virtualize 20k rows.</span></label><label class="task"><input type="checkbox" data-id="d14-do" data-group="checks" /><span><b>Exercise</b> Prototype a virtual list or read how a plugin table paginates.</span></label><label class="task"><input type="checkbox" data-id="d14-verbal" data-group="checks" /><span><b>Verbal</b> What happens if the user drags the time picker during a fetch?</span></label></div>
+</article><article class="day" id="gl-day-15">
+  <button type="button" class="day-head">
+    <div>
+      <h3>Day 15 — Perses</h3>
+      <div class="day-meta">~2 hours · read, then make something small</div>
+    </div>
+    <span class="badge badge-pattern">Day 15</span>
+  </button>
+  <div class="day-body"><label class="task"><input type="checkbox" data-id="d15-rev" data-group="checks" /><span><b>Revision</b> Week 2 plugin model.</span></label><label class="task"><input type="checkbox" data-id="d15-learn" data-group="checks" /><span><b>Concept</b> Dashboards as Kubernetes resources. Grafana import. Observe → Dashboards.</span></label><label class="task"><input type="checkbox" data-id="d15-do" data-group="checks" /><span><b>Exercise</b> Read COO Perses docs. Clone perses if you can run the UI.</span></label><label class="task"><input type="checkbox" data-id="d15-verbal" data-group="checks" /><span><b>Verbal</b> Why namespace-scoped dashboards?</span></label></div>
+</article><article class="day" id="gl-day-16">
+  <button type="button" class="day-head">
+    <div>
+      <h3>Day 16 — UIPlugin YAML</h3>
+      <div class="day-meta">~2 hours · read, then make something small</div>
+    </div>
+    <span class="badge badge-pattern">Day 16</span>
+  </button>
+  <div class="day-body"><label class="task"><input type="checkbox" data-id="d16-rev" data-group="checks" /><span><b>Revision</b> Perses.</span></label><label class="task"><input type="checkbox" data-id="d16-learn" data-group="checks" /><span><b>Concept</b> Cluster Observability Operator installs plugins from UIPlugin CRs.</span></label><label class="task"><input type="checkbox" data-id="d16-do" data-group="checks" /><span><b>Exercise</b> Copy the monitoring + perses YAML from this file. Explain each field.</span></label><label class="task"><input type="checkbox" data-id="d16-verbal" data-group="checks" /><span><b>Verbal</b> What does the operator do that the frontend cannot?</span></label></div>
+</article><article class="day" id="gl-day-17">
+  <button type="button" class="day-head">
+    <div>
+      <h3>Day 17 — Korrel8r</h3>
+      <div class="day-meta">~2 hours · read, then make something small</div>
+    </div>
+    <span class="badge badge-pattern">Day 17</span>
+  </button>
+  <div class="day-body"><label class="task"><input type="checkbox" data-id="d17-rev" data-group="checks" /><span><b>Revision</b> UIPlugin.</span></label><label class="task"><input type="checkbox" data-id="d17-learn" data-group="checks" /><span><b>Concept</b> Alert → related metrics, logs, pods, netflows. Graph in the panel.</span></label><label class="task"><input type="checkbox" data-id="d17-do" data-group="checks" /><span><b>Exercise</b> Read troubleshooting-panel AGENTS.md. Note URL mapping tests.</span></label><label class="task"><input type="checkbox" data-id="d17-verbal" data-group="checks" /><span><b>Verbal</b> What breaks if Logging plugin is not installed?</span></label></div>
+</article><article class="day" id="gl-day-18">
+  <button type="button" class="day-head">
+    <div>
+      <h3>Day 18 — ACM / multi-cluster</h3>
+      <div class="day-meta">~2 hours · read, then make something small</div>
+    </div>
+    <span class="badge badge-pattern">Day 18</span>
+  </button>
+  <div class="day-body"><label class="task"><input type="checkbox" data-id="d18-rev" data-group="checks" /><span><b>Revision</b> Korrel8r.</span></label><label class="task"><input type="checkbox" data-id="d18-learn" data-group="checks" /><span><b>Concept</b> Thanos query, hub Alertmanager, cluster context in the UI.</span></label><label class="task"><input type="checkbox" data-id="d18-do" data-group="checks" /><span><b>Exercise</b> Write 6 lines: what extra props a multi-cluster alerts page needs.</span></label><label class="task"><input type="checkbox" data-id="d18-verbal" data-group="checks" /><span><b>Verbal</b> Why is ‘cluster’ a first-class filter?</span></label></div>
+</article><article class="day" id="gl-day-19">
+  <button type="button" class="day-head">
+    <div>
+      <h3>Day 19 — i18n and reviews</h3>
+      <div class="day-meta">~2 hours · read, then make something small</div>
+    </div>
+    <span class="badge badge-pattern">Day 19</span>
+  </button>
+  <div class="day-body"><label class="task"><input type="checkbox" data-id="d19-rev" data-group="checks" /><span><b>Revision</b> ACM.</span></label><label class="task"><input type="checkbox" data-id="d19-learn" data-group="checks" /><span><b>Concept</b> react-i18next namespaces. Reviews catch missing keys.</span></label><label class="task"><input type="checkbox" data-id="d19-do" data-group="checks" /><span><b>Exercise</b> Find i18n usage in one plugin. List a bad PR comment you would leave.</span></label><label class="task"><input type="checkbox" data-id="d19-verbal" data-group="checks" /><span><b>Verbal</b> Hard-coded English in a table header — why is that a block?</span></label></div>
+</article><article class="day" id="gl-day-20">
+  <button type="button" class="day-head">
+    <div>
+      <h3>Day 20 — Go proxy literacy</h3>
+      <div class="day-meta">~2 hours · read, then make something small</div>
+    </div>
+    <span class="badge badge-pattern">Day 20</span>
+  </button>
+  <div class="day-body"><label class="task"><input type="checkbox" data-id="d20-rev" data-group="checks" /><span><b>Revision</b> i18n.</span></label><label class="task"><input type="checkbox" data-id="d20-learn" data-group="checks" /><span><b>Concept</b> Read one HTTP handler. client-go, mux, proxy to Tempo or Korrel8r.</span></label><label class="task"><input type="checkbox" data-id="d20-do" data-group="checks" /><span><b>Exercise</b> Trace one request from the UI to the in-cluster service on paper.</span></label><label class="task"><input type="checkbox" data-id="d20-verbal" data-group="checks" /><span><b>Verbal</b> Why HTTPS + service CA for plugin proxies?</span></label></div>
+</article><article class="day" id="gl-day-21">
+  <button type="button" class="day-head">
+    <div>
+      <h3>Day 21 — Incidents UX</h3>
+      <div class="day-meta">~2 hours · read, then make something small</div>
+    </div>
+    <span class="badge badge-pattern">Day 21</span>
+  </button>
+  <div class="day-body"><label class="task"><input type="checkbox" data-id="d21-rev" data-group="checks" /><span><b>Revision</b> Go handler.</span></label><label class="task"><input type="checkbox" data-id="d21-learn" data-group="checks" /><span><b>Concept</b> Group alert bursts. Timeline. Severity. Component.</span></label><label class="task"><input type="checkbox" data-id="d21-do" data-group="checks" /><span><b>Exercise</b> Sketch the empty state and the ‘1000 alerts, 3 incidents’ state.</span></label><label class="task"><input type="checkbox" data-id="d21-verbal" data-group="checks" /><span><b>Verbal</b> What must you not hide when you group?</span></label></div>
+</article><article class="day" id="gl-day-22">
+  <button type="button" class="day-head">
+    <div>
+      <h3>Day 22 — Netflows (light)</h3>
+      <div class="day-meta">~2 hours · read, then make something small</div>
+    </div>
+    <span class="badge badge-pattern">Day 22</span>
+  </button>
+  <div class="day-body"><label class="task"><input type="checkbox" data-id="d22-rev" data-group="checks" /><span><b>Revision</b> Incidents.</span></label><label class="task"><input type="checkbox" data-id="d22-learn" data-group="checks" /><span><b>Concept</b> Network observability as another Korrel8r domain.</span></label><label class="task"><input type="checkbox" data-id="d22-do" data-group="checks" /><span><b>Exercise</b> Read a short NetObserv overview. One paragraph in your notes.</span></label><label class="task"><input type="checkbox" data-id="d22-verbal" data-group="checks" /><span><b>Verbal</b> When would you start from flows instead of logs?</span></label></div>
+</article><article class="day" id="gl-day-23">
+  <button type="button" class="day-head">
+    <div>
+      <h3>Day 23 — Read three merged PRs</h3>
+      <div class="day-meta">~2 hours · read, then make something small</div>
+    </div>
+    <span class="badge badge-pattern">Day 23</span>
+  </button>
+  <div class="day-body"><label class="task"><input type="checkbox" data-id="d23-rev" data-group="checks" /><span><b>Revision</b> Netflows.</span></label><label class="task"><input type="checkbox" data-id="d23-learn" data-group="checks" /><span><b>Concept</b> monitoring-plugin theming, incidents, or ACM. Note review comments.</span></label><label class="task"><input type="checkbox" data-id="d23-do" data-group="checks" /><span><b>Exercise</b> Write: a11y, i18n, feature flag, PF misuse — one example each if you find them.</span></label><label class="task"><input type="checkbox" data-id="d23-verbal" data-group="checks" /><span><b>Verbal</b> What would you ask the author in review?</span></label></div>
+</article><article class="day" id="gl-day-24">
+  <button type="button" class="day-head">
+    <div>
+      <h3>Day 24 — Tiny upstream PR</h3>
+      <div class="day-meta">~2 hours · read, then make something small</div>
+    </div>
+    <span class="badge badge-pattern">Day 24</span>
+  </button>
+  <div class="day-body"><label class="task"><input type="checkbox" data-id="d24-rev" data-group="checks" /><span><b>Revision</b> PR comments.</span></label><label class="task"><input type="checkbox" data-id="d24-learn" data-group="checks" /><span><b>Concept</b> DCO Signed-off-by. OWNERS. Good first issue on PatternFly, Perses, or docs.</span></label><label class="task"><input type="checkbox" data-id="d24-do" data-group="checks" /><span><b>Exercise</b> Open or draft a tiny docs/test PR. Practice the sign-off.</span></label><label class="task"><input type="checkbox" data-id="d24-verbal" data-group="checks" /><span><b>Verbal</b> What is DCO for?</span></label></div>
+</article><article class="day" id="gl-day-25">
+  <button type="button" class="day-head">
+    <div>
+      <h3>Day 25 — CrashLoop story</h3>
+      <div class="day-meta">~2 hours · read, then make something small</div>
+    </div>
+    <span class="badge badge-pattern">Day 25</span>
+  </button>
+  <div class="day-body"><label class="task"><input type="checkbox" data-id="d25-rev" data-group="checks" /><span><b>Revision</b> DCO.</span></label><label class="task"><input type="checkbox" data-id="d25-learn" data-group="checks" /><span><b>Concept</b> Design on paper: metrics, logs, traces, related resources.</span></label><label class="task"><input type="checkbox" data-id="d25-do" data-group="checks" /><span><b>Exercise</b> One page with fail paths (no Loki, no Tempo, RBAC deny).</span></label><label class="task"><input type="checkbox" data-id="d25-verbal" data-group="checks" /><span><b>Verbal</b> Teach it in 8 minutes.</span></label></div>
+</article><article class="day" id="gl-day-26">
+  <button type="button" class="day-head">
+    <div>
+      <h3>Day 26 — Senior behaviors</h3>
+      <div class="day-meta">~2 hours · read, then make something small</div>
+    </div>
+    <span class="badge badge-pattern">Day 26</span>
+  </button>
+  <div class="day-body"><label class="task"><input type="checkbox" data-id="d26-rev" data-group="checks" /><span><b>Revision</b> CrashLoop page.</span></label><label class="task"><input type="checkbox" data-id="d26-learn" data-group="checks" /><span><b>Concept</b> Lead, collaborate, upstream, mentor, community — mapped to real artifacts.</span></label><label class="task"><input type="checkbox" data-id="d26-do" data-group="checks" /><span><b>Exercise</b> Rewrite the job bullets in your own words with plugin examples.</span></label><label class="task"><input type="checkbox" data-id="d26-verbal" data-group="checks" /><span><b>Verbal</b> A feature flag vs a new plugin — when?</span></label></div>
+</article><article class="day" id="gl-day-27">
+  <button type="button" class="day-head">
+    <div>
+      <h3>Day 27 — Do not over-invest check</h3>
+      <div class="day-meta">~2 hours · read, then make something small</div>
+    </div>
+    <span class="badge badge-pattern">Day 27</span>
+  </button>
+  <div class="day-body"><label class="task"><input type="checkbox" data-id="d27-rev" data-group="checks" /><span><b>Revision</b> Senior behaviors.</span></label><label class="task"><input type="checkbox" data-id="d27-learn" data-group="checks" /><span><b>Concept</b> Skip list. Confirm you did not rabbit-hole Grafana plugins or eBPF.</span></label><label class="task"><input type="checkbox" data-id="d27-do" data-group="checks" /><span><b>Exercise</b> Cross off two things you will not study this month.</span></label><label class="task"><input type="checkbox" data-id="d27-verbal" data-group="checks" /><span><b>Verbal</b> What did you skip and why?</span></label></div>
+</article><article class="day" id="gl-day-28">
+  <button type="button" class="day-head">
+    <div>
+      <h3>Day 28 — Architecture one-pager</h3>
+      <div class="day-meta">~2 hours · read, then make something small</div>
+    </div>
+    <span class="badge badge-pattern">Day 28</span>
+  </button>
+  <div class="day-body"><label class="task"><input type="checkbox" data-id="d28-rev" data-group="checks" /><span><b>Revision</b> Skip list.</span></label><label class="task"><input type="checkbox" data-id="d28-learn" data-group="checks" /><span><b>Concept</b> Plugins, COO, signals, UX, upstream. First 30 days on the team.</span></label><label class="task"><input type="checkbox" data-id="d28-do" data-group="checks" /><span><b>Exercise</b> Write it. You will reuse this in 1:1s.</span></label><label class="task"><input type="checkbox" data-id="d28-verbal" data-group="checks" /><span><b>Verbal</b> Walk the one-pager without looking.</span></label></div>
+</article><article class="day" id="gl-day-29">
+  <button type="button" class="day-head">
+    <div>
+      <h3>Day 29 — Readiness pass 1</h3>
+      <div class="day-meta">~2 hours · read, then make something small</div>
+    </div>
+    <span class="badge badge-pattern">Day 29</span>
+  </button>
+  <div class="day-body"><label class="task"><input type="checkbox" data-id="d29-rev" data-group="checks" /><span><b>Revision</b> One-pager.</span></label><label class="task"><input type="checkbox" data-id="d29-learn" data-group="checks" /><span><b>Concept</b> Checklist. Honest gaps.</span></label><label class="task"><input type="checkbox" data-id="d29-do" data-group="checks" /><span><b>Exercise</b> Fill the gaps you can in one sitting. Book the rest for day 30.</span></label><label class="task"><input type="checkbox" data-id="d29-verbal" data-group="checks" /><span><b>Verbal</b> Weakest of: plugin loop, PF, queries.</span></label></div>
+</article><article class="day" id="gl-day-30">
+  <button type="button" class="day-head">
+    <div>
+      <h3>Day 30 — Gate</h3>
+      <div class="day-meta">~2 hours · read, then make something small</div>
+    </div>
+    <span class="badge badge-pattern">Day 30</span>
+  </button>
+  <div class="day-body"><label class="task"><input type="checkbox" data-id="d30-rev" data-group="checks" /><span><b>Revision</b> Due today only.</span></label><label class="task"><input type="checkbox" data-id="d30-learn" data-group="checks" /><span><b>Concept</b> Readiness ~85%. Light revision only.</span></label><label class="task"><input type="checkbox" data-id="d30-do" data-group="checks" /><span><b>Exercise</b> 20-minute tour: plugin → PF → PromQL → Loki → Tempo → Korrel8r.</span></label><label class="task"><input type="checkbox" data-id="d30-verbal" data-group="checks" /><span><b>Verbal</b> I don’t know — then the next experiment.</span></label></div>
+</article>
+</section>
+
+<section class="block" id="role" data-search="observability UI role catalyst" data-stype="Section">
+  <p class="kicker">Why this file exists</p>
+  <h2 class="section-title">The job</h2>
+  
+<article class="topic" id="role-catalyst" data-search="observability UI job OpenShift Observe" data-stype="Lesson">
+  <h3>You are the UI catalyst, not a dashboard contractor</h3>
+  
+  <p>The job is to shape how people <i>experience</i> observability across OpenShift and multi-cluster management — not to paint charts in isolation.</p>
+  <p>Backend teams own Prometheus, Loki, Tempo, Alertmanager. You own the <b>single pane</b>: time range, empty states, RBAC-aware lists, and jumps between signals. Product and UX sit in the same design conversation.</p>
+  <div class="diagram">PM / UX ──► you (plugin + PF + a11y)
+metrics team     logging team     tracing team
+       └── UIPlugin / ConsolePlugin ──► Observe menu</div>
+  <p><b>Lead</b> means you propose a plugin boundary, a proxy, a feature flag, and a PatternFly pattern — not a new SPA. <b>Upstream</b> means the feature lands on GitHub first, then in the operator that installs it on a cluster.</p>
+  <div class="callout">React fluency is assumed. The people who move fastest can explain ConsolePlugin, UIPlugin, and why a PromQL range query, a Loki stream, and a Tempo trace share one troubleshooting journey.</div>
+  <p><button type="button" class="toggle-btn" data-complete="topics" data-cid="role-catalyst">Mark complete</button></p>
+</article>
+
+</section>
+
+<section class="block" id="observe" data-search="Observe surfaces OpenShift console" data-stype="Section">
+  <p class="kicker">Product map</p>
+  <h2 class="section-title">Observe surfaces</h2>
+  
+<article class="topic" id="ob-menu" data-search="OpenShift Observe metrics logs traces Perses incidents" data-stype="Lesson">
+  <h3>The Observe menu is the product</h3>
+  
+  <p>Users live under <b>Observe</b> in the OpenShift console. Your work shows up as pages, tabs, and panels there — installed as dynamic plugins, often by the Cluster Observability Operator (COO).</p>
+  <table>
+    <tr><th>Surface</th><th>Job</th><th>Typical backend</th></tr>
+    <tr><td>Metrics / Alerting / Targets</td><td>In-cluster Prometheus; multi-cluster alerts</td><td>Cluster Monitoring Operator, Thanos, Alertmanager</td></tr>
+    <tr><td>Dashboards (Perses)</td><td>Kubernetes-native dashboards; Grafana import path</td><td>Perses Operator, Prometheus, Loki, Tempo</td></tr>
+    <tr><td>Logs</td><td>Query, filter, expand lines; schema viaq vs OTel</td><td>LokiStack</td></tr>
+    <tr><td>Traces</td><td>Search traces, open a waterfall</td><td>Tempo + OpenTelemetry collector</td></tr>
+    <tr><td>Troubleshooting panel</td><td>Graph of related signals and resources</td><td>Korrel8r</td></tr>
+    <tr><td>Incidents</td><td>Group alert bursts into a timeline</td><td>Cluster health analyzer in COO</td></tr>
+  </table>
+  <div class="callout"><b>CMO vs COO.</b> Cluster Monitoring Operator is the default in-cluster Prometheus stack on most OpenShift installs. COO is the meta-operator that adds optional UI plugins, Perses, incidents, ACM wiring, logging and tracing UIs.</div>
+  <p>Public repos to skim: <code>openshift/monitoring-plugin</code>, <code>logging-view-plugin</code>, <code>distributed-tracing-console-plugin</code>, <code>troubleshooting-panel-console-plugin</code>, <code>rhobs/observability-operator</code>.</p>
+  
+  <p><button type="button" class="toggle-btn" data-complete="topics" data-cid="ob-menu">Mark complete</button></p>
+</article>
+
+</section>
+
+<section class="block" id="plugins" data-search="console dynamic plugins UIPlugin" data-stype="Section">
+  <p class="kicker">How code reaches the cluster</p>
+  <h2 class="section-title">Console plugins</h2>
+  
+<article class="topic" id="pl-fed" data-search="OpenShift console dynamic plugin ConsolePlugin" data-stype="Lesson">
+  <h3>Dynamic plugins: Webpack federation, not a new app</h3>
+  
+  <p>The console loads remote JavaScript at runtime (Webpack 5 module federation). You register a <b>ConsolePlugin</b> custom resource. A cluster admin enables it on the console Operator: <code>spec.plugins</code>.</p>
+  <div class="diagram">plugin webpack build → HTTP server on cluster
+ConsolePlugin CR  →  console Operator spec.plugins
+browser loads chunks  →  Observe nav + pages</div>
+  <p>If the UI must call an in-cluster service, declare <code>spec.proxy</code>. The console backend exposes <code>/api/proxy/plugin/…</code>. Default is HTTPS with the service CA. This is why several plugins ship a small <b>Go</b> server: serve assets + proxy Loki/Tempo/Korrel8r.</p>
+  <div class="code-block"><div class="code-head"><span>YAML</span><button type="button" class="copy-btn">Copy</button></div><pre><code>apiVersion: console.openshift.io/v1
+kind: ConsolePlugin
+metadata:
+  name: example-observe
+spec:
+  displayName: Example Observe
+  backend:
+    service:
+      name: example-plugin
+      namespace: example
+      port: 9443
+  proxy:
+    - objectRef:
+        name: loki
+        namespace: openshift-logging
+        kind: Service
+      authorization: UserToken</code></pre></div>
+  <p>Start from <code>openshift/console-plugin-template</code>. Metadata lives in <code>package.json</code> → <code>consolePlugin</code>. Routes and nav live in <code>console-extensions.json</code>. Use Yarn and Webpack as the READMEs do — Vite is not the console contract.</p>
+  <div class="callout">Do not import PatternFly CSS in the plugin. Prefix any custom class with the plugin name. Avoid element selectors that leak outside your tree.</div>
+  <p><button type="button" class="toggle-btn" data-complete="topics" data-cid="pl-fed">Mark complete</button></p>
+</article>
+
+<article class="topic" id="pl-uiplugin" data-search="UIPlugin Cluster Observability Operator" data-stype="Lesson">
+  <h3>COO installs your UI with a UIPlugin CR</h3>
+  
+  <p>For Observe extras, COO watches a <b>UIPlugin</b> and deploys the matching plugin + backends (for example Korrel8r next to the troubleshooting panel, or Perses when monitoring.perses is enabled).</p>
+  <div class="code-block"><div class="code-head"><span>YAML</span><button type="button" class="copy-btn">Copy</button></div><pre><code>apiVersion: observability.openshift.io/v1alpha1
+kind: UIPlugin
+metadata:
+  name: monitoring
+spec:
+  type: Monitoring
+  monitoring:
+    perses:
+      enabled: true</code></pre></div>
+  <p>If Console is GitOps-managed, the plugin name must be in the git <code>Console</code> spec or a sync will disable it. That is an operations bug that looks like a frontend regression.</p>
+  
+  <p><button type="button" class="toggle-btn" data-complete="topics" data-cid="pl-uiplugin">Mark complete</button></p>
+</article>
+
+</section>
+
+<section class="block" id="patternfly" data-search="PatternFly 6 accessibility i18n" data-stype="Section">
+  <p class="kicker">Design system</p>
+  <h2 class="section-title">PatternFly 6</h2>
+  
+<article class="topic" id="pf-6" data-search="PatternFly 6 OpenShift console accessibility" data-stype="Lesson">
+  <h3>PatternFly 6 is the house look. Tailwind is a defect.</h3>
+  
+  <p>OpenShift 4.19 unified admin/developer perspectives and moved the console to <b>PatternFly 6</b>. Console 4.22 is PF 6. New plugins should target PF 6. The console loads PF base styles. If you import <code>@patternfly/patternfly</code> or PF CSS files, you fight theming (including dark/light) and future upgrades.</p>
+  <ul>
+    <li>Use PF React components and CSS variables from the SDK / PF packages as the plugin docs allow.</li>
+    <li>SDK wrappers exist (for example list page headers). Prefer those when the console already has a pattern.</li>
+    <li>No Bootstrap, no Tailwind, no random chart CSS that restyles <code>body</code>.</li>
+    <li><b>Accessibility is in the job description.</b> Keyboard, focus order, contrast, name/role/value, charts that are not color-only. Use axe plus a keyboard pass. PF accessibility docs are the standard.</li>
+    <li><b>i18n:</b> react-i18next. Hard-coded English in a header is a review block on this team.</li>
+  </ul>
+  <div class="callout">A senior review comment you should be ready to leave: ‘This is a custom div that PF already has as Toolbar / Pagination / EmptyState. Use the component so we inherit a11y and theme.’</div>
+  <p><button type="button" class="toggle-btn" data-complete="topics" data-cid="pf-6">Mark complete</button></p>
+</article>
+
+</section>
+
+<section class="block" id="signals" data-search="metrics logs traces three signals" data-stype="Section">
+  <p class="kicker">Domain</p>
+  <h2 class="section-title">Three signals</h2>
+  
+<article class="topic" id="sg-three" data-search="metrics logs traces observability mental model" data-stype="Lesson">
+  <h3>Three signals, one journey</h3>
+  
+  <p>A <b>metric</b> is an aggregate over time (CPU, error rate). A <b>log</b> is an event with a payload. A <b>trace</b> is one request across services (spans). Excellent Observe UI does not dump all three on one page. It starts in the right place and <b>jumps</b> with time range and filters intact.</p>
+  <div class="diagram">CrashLoop → logs first, then metrics (restarts), then events
+High p99   → metrics + trace (who is slow)
+Auth 401s  → logs + trace attributes (user, route)
+‘Everything is on fire’ → incidents / Alertmanager, not raw 4000 alerts</div>
+  <p>Cardinality: high-cardinality labels in Prometheus will melt the backend <i>and</i> the chart. The UI should not invite unbounded label selectors without a warning.</p>
+  
+  <p><button type="button" class="toggle-btn" data-complete="topics" data-cid="sg-three">Mark complete</button></p>
+</article>
+
+</section>
+
+<section class="block" id="queries" data-search="PromQL LogQL TraceQL" data-stype="Section">
+  <p class="kicker">Languages</p>
+  <h2 class="section-title">Query languages</h2>
+  
+<article class="topic" id="qy-langs" data-search="PromQL LogQL TraceQL OpenTelemetry" data-stype="Lesson">
+  <h3>PromQL, LogQL, TraceQL — minimum fluency</h3>
+  
+  <p>You will sit in design reviews where a backend engineer says “just use this query.” You need to know if the UI can show empty, error, timeout, and partial results.</p>
+  <ul>
+    <li><b>PromQL:</b> instant vs range, <code>rate()</code> vs <code>irate()</code>, <code>histogram_quantile</code>, <code>by</code>/<code>without</code>, recording vs alerting rules. Write ten queries on a real Prometheus.</li>
+    <li><b>LogQL:</b> stream selectors, line filters, JSON unpack, then metric queries over logs. The logging plugin has a schema switch: legacy <b>viaq</b> vs <b>OTel</b> logs.</li>
+    <li><b>TraceQL:</b> find traces by service, duration, status, attributes. Waterfall, span links, exemplars from metrics into traces. OTel semantic conventions (<code>service.name</code>, k8s, http).</li>
+  </ul>
+  <div class="code-block"><div class="code-head"><span>text</span><button type="button" class="copy-btn">Copy</button></div><pre><code># PromQL — request rate
+sum(rate(http_requests_total[5m])) by (code)
+
+# LogQL — errors in a namespace
+{kubernetes_namespace_name=&quot;shop&quot;} |= &quot;error&quot;
+
+# TraceQL — slow checkouts
+{ resource.service.name = &quot;checkout&quot; &amp;&amp; duration &gt; 2s }</code></pre></div>
+  <p>Jaeger still appears in older talks. Current tracing UI on OpenShift is <b>Tempo</b> plus the OpenTelemetry collector. Learn Tempo; do not become a Jaeger maintainer.</p>
+  <div class="callout">Performance: abort in-flight fetches when the time picker moves. Cap series. Virtualize huge log/trace tables. A pretty chart that freezes the console is a P1.</div>
+  <p><button type="button" class="toggle-btn" data-complete="topics" data-cid="qy-langs">Mark complete</button></p>
+</article>
+
+</section>
+
+<section class="block" id="perses" data-search="Perses dashboards as code" data-stype="Section">
+  <p class="kicker">Visualization future</p>
+  <h2 class="section-title">Perses</h2>
+  
+<article class="topic" id="pe-k8s" data-search="Perses dashboards Grafana import OpenShift" data-stype="Lesson">
+  <h3>Perses is dashboards as cluster resources</h3>
+  
+  <p>Perses is an open-source, cloud-native dashboard tool. On OpenShift it is wired through COO: <b>Observe → Dashboards (Perses)</b>. Dashboards and datasources are namespace-scoped CRDs, which matches Kubernetes RBAC and GitOps (dashboard as YAML).</p>
+  <ul>
+    <li>Graphical editor in the console (create, rename, duplicate).</li>
+    <li>Grafana import for the migration story — you should know it exists, not become a Grafana plugin author.</li>
+    <li>Datasources: Prometheus / Thanos, Loki, Tempo (as documented for the build you target).</li>
+    <li>PatternFly theming work already exists in monitoring-plugin so Perses does not look like a foreign app.</li>
+  </ul>
+  <div class="callout">If you can run one thing extra in week 3: clone <code>perses-dev/perses</code>, create a dashboard as YAML, import one Grafana JSON. That conversation comes up constantly.</div>
+  <p><button type="button" class="toggle-btn" data-complete="topics" data-cid="pe-k8s">Mark complete</button></p>
+</article>
+
+</section>
+
+<section class="block" id="korrel8r" data-search="Korrel8r troubleshooting correlation" data-stype="Section">
+  <p class="kicker">The JD’s ‘unified UI workflows’</p>
+  <h2 class="section-title">Correlation</h2>
+  
+<article class="topic" id="kr-panel" data-search="Korrel8r troubleshooting panel signal correlation" data-stype="Lesson">
+  <h3>Correlation is the unified workflow</h3>
+  
+  <p>Korrel8r is an open-source correlation engine (rules that connect alerts, metrics, logs, pods, netflows). The <b>troubleshooting panel</b> turns results into an interactive graph. Click a node → the matching Observe or workload page with the right query.</p>
+  <div class="diagram">Alert firing
+  → Korrel8r query
+  → nodes: metrics, logs, pod, netflow
+  → click → console URL with filters
+If Logging plugin is missing, log nodes will not render usefully.</div>
+  <p>The panel plugin maps Korrel8r domains to OpenShift URLs. Those mappings <b>must stay accurate</b> — the repo calls out extensive unit tests. Breaking a URL map is a silent product bug: the graph looks fine, the click goes to the wrong page.</p>
+  <p>Clone <code>korrel8r/korrel8r</code> and <code>openshift/troubleshooting-panel-console-plugin</code>. Read AGENTS.md in the panel repo.</p>
+  
+  <p><button type="button" class="toggle-btn" data-complete="topics" data-cid="kr-panel">Mark complete</button></p>
+</article>
+
+</section>
+
+<section class="block" id="tools" data-search="tools oc patternfly prometheus" data-stype="Section">
+  <p class="kicker">Laptop</p>
+  <h2 class="section-title">Tools</h2>
+  
+<article class="topic" id="tl-install" data-search="oc kubectl podman yarn CRC PatternFly axe" data-stype="Lesson">
+  <h3>Install this week, not after you join</h3>
+  
+  <table>
+    <tr><th>Tool</th><th>Why</th><th>How far in 30 days</th></tr>
+    <tr><td><code>oc</code> + kubectl + podman</td><td>Every plugin README assumes them</td><td>Daily muscle memory</td></tr>
+    <tr><td>OpenShift Local (CRC) or a sandbox cluster</td><td>Console + plugins against a real API</td><td>One cluster you can break</td></tr>
+    <tr><td>Yarn (classic, as plugin repos use it)</td><td>Template and console still yarn</td><td>Install + start-console.sh</td></tr>
+    <tr><td>PatternFly 6 React docs</td><td>House design system</td><td>Three screens, no custom CSS soup</td></tr>
+    <tr><td>Prometheus + Grafana (kind/minikube)</td><td>PromQL muscle</td><td>Ten useful queries</td></tr>
+    <tr><td>Loki + Tempo or the OTel demo</td><td>Logs + traces</td><td>One request across three signals</td></tr>
+    <tr><td>Perses (clone and run UI if you can)</td><td>Dashboarding direction</td><td>One YAML dashboard + one Grafana import</td></tr>
+    <tr><td>axe DevTools + keyboard-only</td><td>Accessible at the bar they ship</td><td>Audit one PF page</td></tr>
+    <tr><td>GitHub CLI + DCO sign-off</td><td>Upstream PRs need Signed-off-by</td><td>One tiny docs or test PR</td></tr>
+  </table>
+  
+  <p><button type="button" class="toggle-btn" data-complete="topics" data-cid="tl-install">Mark complete</button></p>
+</article>
+
+</section>
+
+<section class="block" id="repos" data-search="repos to clone OpenShift plugins" data-stype="Section">
+  <p class="kicker">Source</p>
+  <h2 class="section-title">Repos to clone</h2>
+  
+<article class="topic" id="rp-clone" data-search="github console-plugin-template monitoring-plugin" data-stype="Lesson">
+  <h3>Read before you write</h3>
+  
+  <table>
+    <tr><th>Repository</th><th>Extract in a weekend</th></tr>
+    <tr><td>openshift/console-plugin-template</td><td>Local console-in-container loop, consolePlugin, extensions JSON</td></tr>
+    <tr><td>openshift/monitoring-plugin</td><td>Feature flags (CMO vs COO), Perses theming, ACM alerting, incidents</td></tr>
+    <tr><td>openshift/logging-view-plugin</td><td>Log list UX, Loki proxy, viaq vs OTel schema</td></tr>
+    <tr><td>openshift/distributed-tracing-console-plugin</td><td>React + Go hybrid, Perses for traces, Tempo proxy</td></tr>
+    <tr><td>openshift/troubleshooting-panel-console-plugin</td><td>Korrel8r URL mapping, topology graph, tests you must not break</td></tr>
+    <tr><td>rhobs/observability-operator</td><td>UIPlugin CR is how UI actually gets onto a cluster</td></tr>
+    <tr><td>korrel8r/korrel8r</td><td>Rules that turn an alert into related logs/metrics/pods</td></tr>
+    <tr><td>perses-dev/perses</td><td>Dashboard-as-code, query plugins</td></tr>
+  </table>
+  <p>You will not finish every repo. The template loop + monitoring-plugin README + one tracing or logging plugin is a strong start.</p>
+  
+  <p><button type="button" class="toggle-btn" data-complete="topics" data-cid="rp-clone">Mark complete</button></p>
+</article>
+
+</section>
+
+<section class="block" id="skip" data-search="what not to study" data-stype="Section">
+  <p class="kicker">Focus</p>
+  <h2 class="section-title">Do not over-invest</h2>
+  
+<article class="topic" id="sk-no" data-search="skip grafana plugins eBPF operator-sdk" data-stype="Lesson">
+  <h3>Do not over-invest</h3>
+  
+  <p><b>Skip or keep light:</b> training a custom ML model for incidents; replacing PatternFly; deep Grafana plugin authoring (visualization is moving to Perses); full operator-SDK mastery; eBPF internals; becoming a Jaeger maintainer.</p>
+  <p><b>Worth four hours each:</b> network observability (netflows in Korrel8r); incident grouping UX; Thanos query path for ACM; OpenShift 4.19 unified perspective. Internal Konflux/CI after you have a laptop and internal docs.</p>
+  
+  <p><button type="button" class="toggle-btn" data-complete="topics" data-cid="sk-no">Mark complete</button></p>
+</article>
+
+</section>
+
+<section class="block" id="senior" data-search="senior behaviors lead mentor upstream" data-stype="Section">
+  <p class="kicker">How you show up</p>
+  <h2 class="section-title">Senior behaviors</h2>
+  
+<article class="topic" id="sr-jd" data-search="lead architect mentor upstream community" data-stype="Lesson">
+  <h3>Map the job bullets to artifacts</h3>
+  
+  <table>
+    <tr><th>Line</th><th>What excellence looks like by week 6 on the team</th></tr>
+    <tr><td>Lead &amp; architect</td><td>You propose a plugin boundary, a proxy, a feature flag, and a PF pattern — not a new SPA</td></tr>
+    <tr><td>Catalyze collaboration</td><td>You translate Loki tenant limits and Tempo retention into UI copy, empty states, and UX with PM</td></tr>
+    <tr><td>Own &amp; deliver upstream</td><td>Feature lands on GitHub first, then COO/CMO. You know DCO, OWNERS, backport</td></tr>
+    <tr><td>Mentor &amp; influence</td><td>Reviews catch a11y, i18n keys, PF misuse, unbounded fetches — not only lint</td></tr>
+    <tr><td>Community</td><td>You can talk Perses, Korrel8r, or console plugins without reading slides first</td></tr>
+  </table>
+  <p>Write a one-page architecture before day 30: plugins, COO, signals, UX, upstream. You will reuse it in 1:1s.</p>
+  
+  <p><button type="button" class="toggle-btn" data-complete="topics" data-cid="sr-jd">Mark complete</button></p>
+</article>
+
+</section>
+
+<section class="block" id="practical" data-search="Practical studies Observe UI" data-stype="Section">
+  <p class="kicker">10 studies</p>
+  <h2 class="section-title">Practical studies</h2>
+  <p class="lede">Sketches, not production PRs. Speak the approach before you open the snippet. Mark complete when you can redo it on a whiteboard.</p>
+  <div class="callout">These are original teaching scenarios. They are not claimed interview questions from any employer.</div>
+  <div class="diagram">read the problem
+  → name the plugin / CR / query
+  → say the empty and error states
+  → then look at the snippet</div>
+  
+<article class="topic" id="ps-plugin-loop" data-search="console plugin template local loop" data-stype="Practical study">
+  <h3>Ship a Hello Observe plugin</h3>
+  
+  <p><b>Problem.</b> You need a page under Observe that is not a new SPA.</p>
+  <p><b>Approach.</b> Clone console-plugin-template. Keep Webpack + Yarn. Register consolePlugin in package.json, a console-extensions.json nav item, a ConsolePlugin CR. Enable spec.plugins. Do not import PatternFly CSS.</p>
+  <div class="code-block"><div class="code-head"><span>JSON</span><button type="button" class="copy-btn">Copy</button></div><pre><code>{
+  &quot;consolePlugin&quot;: {
+    &quot;exposedModules&quot;: { &quot;./ObservePage&quot;: &quot;./src/components/ObservePage&quot; }
+  }
+}</code></pre></div>
+  <p><b>Where this shows up.</b> Every Observe UI that is not baked into the console binary.</p>
+  <p><b>Trap.</b> Starting a Vite app and iframe-ing it into the console.</p>
+  
+  <p><button type="button" class="toggle-btn" data-complete="reactTopics" data-cid="ps-plugin-loop">Mark complete</button></p>
+</article>
+
+<article class="topic" id="ps-proxy" data-search="ConsolePlugin spec.proxy Loki" data-stype="Practical study">
+  <h3>Logs page without CORS hacks</h3>
+  
+  <p><b>Problem.</b> The browser cannot talk to Loki directly. Copy-paste fetch to an internal URL fails CORS and RBAC.</p>
+  <p><b>Approach.</b> Declare spec.proxy to the Loki service. Call /api/proxy/plugin/<name>/…. Go (or the template server) terminates TLS with the service CA. Send the user token if the CR says so.</p>
+  <div class="code-block"><div class="code-head"><span>YAML</span><button type="button" class="copy-btn">Copy</button></div><pre><code>spec:
+  proxy:
+    - objectRef:
+        name: loki
+        namespace: openshift-logging
+        kind: Service
+      authorization: UserToken</code></pre></div>
+  <p><b>Where this shows up.</b> logging-view-plugin, tracing plugin, Korrel8r panel.</p>
+  <p><b>Trap.</b> Hard-coding a cluster IP in frontend code.</p>
+  
+  <p><button type="button" class="toggle-btn" data-complete="reactTopics" data-cid="ps-proxy">Mark complete</button></p>
+</article>
+
+<article class="topic" id="ps-pf-table" data-search="PatternFly 6 table toolbar empty state" data-stype="Practical study">
+  <h3>Filterable list that looks like the console</h3>
+  
+  <p><b>Problem.</b> PM wants a ‘nice dashboard table’ of firing alerts.</p>
+  <p><b>Approach.</b> Toolbar + filter + pagination + EmptyState from PatternFly 6. Keyboard through the toolbar. Prefix any extra class with the plugin name.</p>
+  <div class="code-block"><div class="code-head"><span>TSX</span><button type="button" class="copy-btn">Copy</button></div><pre><code>&lt;Toolbar&gt;
+  &lt;ToolbarContent&gt;
+    &lt;SearchInput value={q} onChange={(_, v) =&gt; setQ(v)} /&gt;
+  &lt;/ToolbarContent&gt;
+&lt;/Toolbar&gt;
+{rows.length ? &lt;Table rows={rows} /&gt; : &lt;EmptyState titleText=&quot;No alerts&quot; /&gt;}</code></pre></div>
+  <p><b>Where this shows up.</b> Alerting, log lines, trace search hits.</p>
+  <p><b>Trap.</b> Tailwind table + custom pagination that skips PF a11y.</p>
+  
+  <p><button type="button" class="toggle-btn" data-complete="reactTopics" data-cid="ps-pf-table">Mark complete</button></p>
+</article>
+
+<article class="topic" id="ps-signals" data-search="CrashLoop logs then metrics then events" data-stype="Practical study">
+  <h3>CrashLoop: pick the first click</h3>
+  
+  <p><b>Problem.</b> A deployment is CrashLooping. The user is already in the console.</p>
+  <p><b>Approach.</b> Logs first (why did the process die). Then metrics (restart count). Then events / Korrel8r for related objects. Do not open a 40-panel Grafana board as v1.</p>
+  <div class="code-block"><div class="code-head"><span>text</span><button type="button" class="copy-btn">Copy</button></div><pre><code>CrashLoop
+  1. Observe → Logs  (last lines, previous container)
+  2. Metrics         (restarts, CPU OOM?)
+  3. Troubleshooting (related pods, alerts)</code></pre></div>
+  <p><b>Where this shows up.</b> Workload debugging from Observe.</p>
+  <p><b>Trap.</b> Starting with a custom dashboard because it looks senior.</p>
+  
+  <p><button type="button" class="toggle-btn" data-complete="reactTopics" data-cid="ps-signals">Mark complete</button></p>
+</article>
+
+<article class="topic" id="ps-promql" data-search="PromQL rate by code cardinality" data-stype="Practical study">
+  <h3>Error-rate chart that will not melt Prometheus</h3>
+  
+  <p><b>Problem.</b> Show request error ratio for a service. Someone wants a label for every user id.</p>
+  <p><b>Approach.</b> rate() on a counter, then divide 5xx by total. Aggregate by code or route — never by user. Cap series in the UI. Abort the fetch when the time picker moves.</p>
+  <div class="code-block"><div class="code-head"><span>PromQL</span><button type="button" class="copy-btn">Copy</button></div><pre><code>sum(rate(http_requests_total{code=~&quot;5..&quot;}[5m]))
+/
+sum(rate(http_requests_total[5m]))</code></pre></div>
+  <p><b>Where this shows up.</b> Metrics pages, Perses panels, ACM aggregated views.</p>
+  <p><b>Trap.</b> histogram_quantile on a high-cardinality label without a recording rule.</p>
+  
+  <p><button type="button" class="toggle-btn" data-complete="reactTopics" data-cid="ps-promql">Mark complete</button></p>
+</article>
+
+<article class="topic" id="ps-logql" data-search="LogQL stream selector JSON unpack" data-stype="Practical study">
+  <h3>Find checkout errors without grepping a node</h3>
+  
+  <p><b>Problem.</b> Checkout is failing for one namespace. Logs are in Loki.</p>
+  <p><b>Approach.</b> Stream selector first (namespace, container), then a line filter, then JSON unpack if the schema is structured. Know viaq vs OTel field names before you invent a filter.</p>
+  <div class="code-block"><div class="code-head"><span>LogQL</span><button type="button" class="copy-btn">Copy</button></div><pre><code>{kubernetes_namespace_name=&quot;shop&quot;, app=&quot;checkout&quot;}
+  |= &quot;error&quot;
+  | json</code></pre></div>
+  <p><b>Where this shows up.</b> logging-view-plugin query bar.</p>
+  <p><b>Trap.</b> A regex across all tenants because ‘it worked in grep’.</p>
+  
+  <p><button type="button" class="toggle-btn" data-complete="reactTopics" data-cid="ps-logql">Mark complete</button></p>
+</article>
+
+<article class="topic" id="ps-perses" data-search="Perses dashboard YAML GitOps" data-stype="Practical study">
+  <h3>Dashboard as a namespaced CR</h3>
+  
+  <p><b>Problem.</b> Platform team wants the same SLO board in every shop namespace, reviewable in git.</p>
+  <p><b>Approach.</b> Perses dashboard + datasource CRs, not a Grafana folder nobody owns. Import Grafana JSON once as a migration, then treat YAML as source of truth.</p>
+  <div class="code-block"><div class="code-head"><span>YAML</span><button type="button" class="copy-btn">Copy</button></div><pre><code>apiVersion: perses.dev/v1alpha1
+kind: PersesDashboard
+metadata:
+  name: checkout-slo
+  namespace: shop
+spec:
+  display:
+    name: Checkout SLO</code></pre></div>
+  <p><b>Where this shows up.</b> Observe → Dashboards (Perses).</p>
+  <p><b>Trap.</b> Editing production Grafana by hand forever.</p>
+  
+  <p><button type="button" class="toggle-btn" data-complete="reactTopics" data-cid="ps-perses">Mark complete</button></p>
+</article>
+
+<article class="topic" id="ps-korrel8r" data-search="Korrel8r URL map troubleshooting panel" data-stype="Practical study">
+  <h3>Alert click that must not 404</h3>
+  
+  <p><b>Problem.</b> The graph shows a log node. Click should open Observe → Logs with the right query.</p>
+  <p><b>Approach.</b> Keep the domain → console URL map in lockstep with plugin routes. Add a unit test for the href. If Logging is not installed, the node should say so — not fail silently.</p>
+  <div class="code-block"><div class="code-head"><span>text</span><button type="button" class="copy-btn">Copy</button></div><pre><code>alert node
+  → korrel8r neighbours
+  → console URL (plugin route + query)
+  → tests: snapshot the href</code></pre></div>
+  <p><b>Where this shows up.</b> troubleshooting-panel-console-plugin.</p>
+  <p><b>Trap.</b> Pretty graph, wrong href. Looks like a backend bug.</p>
+  
+  <p><button type="button" class="toggle-btn" data-complete="reactTopics" data-cid="ps-korrel8r">Mark complete</button></p>
+</article>
+
+<article class="topic" id="ps-gitops-plugin" data-search="GitOps Console spec.plugins wipe" data-stype="Practical study">
+  <h3>Plugin vanished after a sync</h3>
+  
+  <p><b>Problem.</b> You enabled a plugin in the UI. Next morning it is gone. GitOps owns the Console CR.</p>
+  <p><b>Approach.</b> The plugin name must be in the git Console spec. A live toggle without git is a race the reconcilers will win.</p>
+  <div class="code-block"><div class="code-head"><span>YAML</span><button type="button" class="copy-btn">Copy</button></div><pre><code>apiVersion: operator.openshift.io/v1
+kind: Console
+spec:
+  plugins:
+    - monitoring-plugin
+    - logging-view-plugin</code></pre></div>
+  <p><b>Where this shows up.</b> Any cluster with Argo/ACM policy on console.</p>
+  <p><b>Trap.</b> Debugging Webpack for a day when git overwrote spec.plugins.</p>
+  
+  <p><button type="button" class="toggle-btn" data-complete="reactTopics" data-cid="ps-gitops-plugin">Mark complete</button></p>
+</article>
+
+<article class="topic" id="ps-a11y-chart" data-search="accessibility charts not color only" data-stype="Practical study">
+  <h3>A chart a keyboard user can use</h3>
+  
+  <p><b>Problem.</b> Error vs OK is red vs green. Color-blind and screen-reader users get nothing.</p>
+  <p><b>Approach.</b> Pattern + label + not color-only. Summary in text. Live region for ‘query failed’. Focus order through the time picker, then the chart, then the table.</p>
+  <div class="code-block"><div class="code-head"><span>text</span><button type="button" class="copy-btn">Copy</button></div><pre><code>OK:  pattern + &quot;2xx&quot; label
+ERR: pattern + &quot;5xx&quot; label
+SR:  &quot;Query failed: timeout&quot; in a live region</code></pre></div>
+  <p><b>Where this shows up.</b> Every Observe chart.</p>
+  <p><b>Trap.</b> Custom canvas with no name/role/value.</p>
+  
+  <p><button type="button" class="toggle-btn" data-complete="reactTopics" data-cid="ps-a11y-chart">Mark complete</button></p>
+</article>
+
+</section>
+
+<section class="block" id="feq" data-search="Observe UI interview questions" data-stype="Section">
+  <p class="kicker">24 questions</p>
+  <h2 class="section-title">Q&amp;A</h2>
+  <p class="lede">Answer standing up. Mark complete only if you can teach the short answer. Practice items — not official company lists.</p>
+  <div class="tabs" data-tabs="feq">
+    <button type="button" class="tab active" data-tab="all">All (24)</button>
+    <button type="button" class="tab" data-tab="plugin">plugin</button>
+    <button type="button" class="tab" data-tab="patternfly">patternfly</button>
+    <button type="button" class="tab" data-tab="signals">signals</button>
+    <button type="button" class="tab" data-tab="query">query</button>
+    <button type="button" class="tab" data-tab="perses">perses</button>
+    <button type="button" class="tab" data-tab="korrel8r">korrel8r</button>
+    <button type="button" class="tab" data-tab="ops">ops</button>
+    <button type="button" class="tab" data-tab="senior">senior</button>
+  </div>
+  
+<article class="q" id="feq-1" data-level="plugin" data-cat="console" data-search="What is an OpenShift console dynamic plugin?" data-stype="Interview question" data-mock="1">
+  <div class="meta-row"><span class="badge badge-js">plugin</span><span class="chip">console</span><span class="chip">Q1</span></div>
+  <h3>1. What is an OpenShift console dynamic plugin?</h3>
+  <p><button type="button" class="toggle-btn" data-toggle="feq-a-1">Reveal answer</button>
+     <button type="button" class="toggle-btn" data-complete="questions" data-cid="feq-1">Mark complete</button></p>
+  <div class="reveal" id="feq-a-1">
+    <p><b>Short answer.</b> A Webpack 5 federated bundle the console loads at runtime, registered with a ConsolePlugin CR.</p>
+    <p><b>Deep explanation.</b> You are not shipping a second SPA. Nav, pages, and tabs are console-extensions. Admins enable the plugin on the console Operator spec.plugins list.</p>
+    
+    <p><b>Common misconception.</b> It is an iframe of Grafana.</p>
+    <p><b>Follow-up.</b> Where do proxy routes for Loki live?</p>
+  </div>
+</article>
+<article class="q" id="feq-2" data-level="plugin" data-cat="console" data-search="Why does a plugin declare spec.proxy?" data-stype="Interview question" data-mock="1">
+  <div class="meta-row"><span class="badge badge-js">plugin</span><span class="chip">console</span><span class="chip">Q2</span></div>
+  <h3>2. Why does a plugin declare spec.proxy?</h3>
+  <p><button type="button" class="toggle-btn" data-toggle="feq-a-2">Reveal answer</button>
+     <button type="button" class="toggle-btn" data-complete="questions" data-cid="feq-2">Mark complete</button></p>
+  <div class="reveal" id="feq-a-2">
+    <p><b>Short answer.</b> So the console backend can reach in-cluster services (Loki, Tempo, Korrel8r) with TLS and optional user token.</p>
+    <p><b>Deep explanation.</b> The browser must not CORS-hack cluster IPs. Default is HTTPS plus the service CA. Several plugins add a small Go server to serve assets and proxy.</p>
+    
+    <p><b>Common misconception.</b> proxy is only for external CDNs.</p>
+    <p><b>Follow-up.</b> What URL prefix does the console expose for plugin proxies?</p>
+  </div>
+</article>
+<article class="q" id="feq-3" data-level="plugin" data-cat="console" data-search="What is a UIPlugin CR for?" data-stype="Interview question" data-mock="1">
+  <div class="meta-row"><span class="badge badge-js">plugin</span><span class="chip">console</span><span class="chip">Q3</span></div>
+  <h3>3. What is a UIPlugin CR for?</h3>
+  <p><button type="button" class="toggle-btn" data-toggle="feq-a-3">Reveal answer</button>
+     <button type="button" class="toggle-btn" data-complete="questions" data-cid="feq-3">Mark complete</button></p>
+  <div class="reveal" id="feq-a-3">
+    <p><b>Short answer.</b> Cluster Observability Operator watches it and deploys the matching Observe UI (and backends) for you.</p>
+    <p><b>Deep explanation.</b> Example: type Monitoring with perses.enabled installs Perses wiring. You still need the plugin name on the Console spec if GitOps owns it.</p>
+    
+    <p><b>Common misconception.</b> UIPlugin replaces ConsolePlugin.</p>
+    <p><b>Follow-up.</b> What happens if GitOps Console spec omits the plugin name?</p>
+  </div>
+</article>
+<article class="q" id="feq-4" data-level="plugin" data-cat="console" data-search="Why Webpack 5 and Yarn, not Vite, for these plugins?" data-stype="Interview question" data-mock="1">
+  <div class="meta-row"><span class="badge badge-js">plugin</span><span class="chip">console</span><span class="chip">Q4</span></div>
+  <h3>4. Why Webpack 5 and Yarn, not Vite, for these plugins?</h3>
+  <p><button type="button" class="toggle-btn" data-toggle="feq-a-4">Reveal answer</button>
+     <button type="button" class="toggle-btn" data-complete="questions" data-cid="feq-4">Mark complete</button></p>
+  <div class="reveal" id="feq-a-4">
+    <p><b>Short answer.</b> The console’s module federation contract is Webpack 5. The template and sibling plugins are Yarn.</p>
+    <p><b>Deep explanation.</b> Vite can be a fine app bundler elsewhere. Here, mismatch means the remote entry never loads. Follow the template until you have a reason and a reviewer.</p>
+    
+    <p><b>Common misconception.</b> Any bundler is fine if the JS is valid.</p>
+    <p><b>Follow-up.</b> What file lists exposed modules for federation?</p>
+  </div>
+</article>
+<article class="q" id="feq-5" data-level="plugin" data-cat="console" data-search="Why must plugins not import PatternFly CSS?" data-stype="Interview question" data-mock="1">
+  <div class="meta-row"><span class="badge badge-js">plugin</span><span class="chip">console</span><span class="chip">Q5</span></div>
+  <h3>5. Why must plugins not import PatternFly CSS?</h3>
+  <p><button type="button" class="toggle-btn" data-toggle="feq-a-5">Reveal answer</button>
+     <button type="button" class="toggle-btn" data-complete="questions" data-cid="feq-5">Mark complete</button></p>
+  <div class="reveal" id="feq-a-5">
+    <p><b>Short answer.</b> The console already loads PF. A second copy fights theme (including dark/light) and future PF upgrades.</p>
+    <p><b>Deep explanation.</b> Prefix custom classes with the plugin name. Avoid element selectors that leak. Use PF React components and CSS variables.</p>
+    
+    <p><b>Common misconception.</b> Importing @patternfly/patternfly makes it look more ‘official’.</p>
+    <p><b>Follow-up.</b> What OpenShift version moved the console to PatternFly 6?</p>
+  </div>
+</article>
+<article class="q" id="feq-6" data-level="patternfly" data-cat="ui" data-search="What does PatternFly 6 change for a plugin author?" data-stype="Interview question" data-mock="1">
+  <div class="meta-row"><span class="badge badge-js">patternfly</span><span class="chip">ui</span><span class="chip">Q6</span></div>
+  <h3>6. What does PatternFly 6 change for a plugin author?</h3>
+  <p><button type="button" class="toggle-btn" data-toggle="feq-a-6">Reveal answer</button>
+     <button type="button" class="toggle-btn" data-complete="questions" data-cid="feq-6">Mark complete</button></p>
+  <div class="reveal" id="feq-a-6">
+    <p><b>Short answer.</b> OCP 4.19+ console is PF 6. New plugins should target PF 6, not PF 4/5 or Tailwind.</p>
+    <p><b>Deep explanation.</b> Use PF components the console already uses (Toolbar, Pagination, EmptyState). Accessibility and theme come with them.</p>
+    
+    <p><b>Common misconception.</b> PF is optional if your charts look modern.</p>
+    <p><b>Follow-up.</b> Name a review comment you would leave on a custom div that is already a PF component.</p>
+  </div>
+</article>
+<article class="q" id="feq-7" data-level="patternfly" data-cat="ui" data-search="What is an accessibility miss that will fail a senior review?" data-stype="Interview question" data-mock="1">
+  <div class="meta-row"><span class="badge badge-js">patternfly</span><span class="chip">ui</span><span class="chip">Q7</span></div>
+  <h3>7. What is an accessibility miss that will fail a senior review?</h3>
+  <p><button type="button" class="toggle-btn" data-toggle="feq-a-7">Reveal answer</button>
+     <button type="button" class="toggle-btn" data-complete="questions" data-cid="feq-7">Mark complete</button></p>
+  <div class="reveal" id="feq-a-7">
+    <p><b>Short answer.</b> Color-only charts, no keyboard path through the toolbar, unlabeled icon buttons, missing live region on query failure.</p>
+    <p><b>Deep explanation.</b> WCAG is in the job. axe plus a keyboard pass. Name/role/value on custom widgets. i18n keys — hard-coded English in a header is a block.</p>
+    
+    <p><b>Common misconception.</b> a11y is a nice-to-have after GA.</p>
+    <p><b>Follow-up.</b> How would you announce ‘query timed out’ to a screen reader?</p>
+  </div>
+</article>
+<article class="q" id="feq-8" data-level="signals" data-cat="domain" data-search="When do you start with logs vs metrics vs traces?" data-stype="Interview question" data-mock="1">
+  <div class="meta-row"><span class="badge badge-js">signals</span><span class="chip">domain</span><span class="chip">Q8</span></div>
+  <h3>8. When do you start with logs vs metrics vs traces?</h3>
+  <p><button type="button" class="toggle-btn" data-toggle="feq-a-8">Reveal answer</button>
+     <button type="button" class="toggle-btn" data-complete="questions" data-cid="feq-8">Mark complete</button></p>
+  <div class="reveal" id="feq-a-8">
+    <p><b>Short answer.</b> Logs: a specific event (crash, 401). Metrics: aggregates (error rate, p99). Traces: one request across services.</p>
+    <p><b>Deep explanation.</b> CrashLoop → logs, then restart metrics. High p99 → metrics then trace. Auth failures → logs plus trace attributes.</p>
+    
+    <p><b>Common misconception.</b> Always open traces first because they are richest.</p>
+    <p><b>Follow-up.</b> What do you open if ‘everything is on fire’?</p>
+  </div>
+</article>
+<article class="q" id="feq-9" data-level="signals" data-cat="domain" data-search="Why is a high-cardinality label a UI bug as well as a backend bug?" data-stype="Interview question" data-mock="1">
+  <div class="meta-row"><span class="badge badge-js">signals</span><span class="chip">domain</span><span class="chip">Q9</span></div>
+  <h3>9. Why is a high-cardinality label a UI bug as well as a backend bug?</h3>
+  <p><button type="button" class="toggle-btn" data-toggle="feq-a-9">Reveal answer</button>
+     <button type="button" class="toggle-btn" data-complete="questions" data-cid="feq-9">Mark complete</button></p>
+  <div class="reveal" id="feq-a-9">
+    <p><b>Short answer.</b> The chart invites unbounded series; Prometheus and the browser both melt.</p>
+    <p><b>Deep explanation.</b> Do not offer user-id as a PromQL group-by. Cap series. Warn. Prefer recording rules for expensive queries.</p>
+    
+    <p><b>Common misconception.</b> The UI should run whatever query the user typed.</p>
+    <p><b>Follow-up.</b> How do you abort work when the time picker moves?</p>
+  </div>
+</article>
+<article class="q" id="feq-10" data-level="query" data-cat="promql" data-search="rate() vs irate() — when is rate() the default?" data-stype="Interview question" data-mock="1">
+  <div class="meta-row"><span class="badge badge-js">query</span><span class="chip">promql</span><span class="chip">Q10</span></div>
+  <h3>10. rate() vs irate() — when is rate() the default?</h3>
+  <p><button type="button" class="toggle-btn" data-toggle="feq-a-10">Reveal answer</button>
+     <button type="button" class="toggle-btn" data-complete="questions" data-cid="feq-10">Mark complete</button></p>
+  <div class="reveal" id="feq-a-10">
+    <p><b>Short answer.</b> rate() averages over the range; use it for graphs and SLOs. irate() uses the last two points — spiky, for instant troubleshooting.</p>
+    <p><b>Deep explanation.</b> Counters need increase/rate, not a raw gauge plot. histogram_quantile needs a histogram. by/without must match the question.</p>
+    
+    <p><b>Common misconception.</b> irate is always more accurate.</p>
+    <p><b>Follow-up.</b> Write PromQL for 5xx ratio without grouping by user.</p>
+  </div>
+</article>
+<article class="q" id="feq-11" data-level="query" data-cat="logql" data-search="What is a LogQL stream selector vs a line filter?" data-stype="Interview question" data-mock="1">
+  <div class="meta-row"><span class="badge badge-js">query</span><span class="chip">logql</span><span class="chip">Q11</span></div>
+  <h3>11. What is a LogQL stream selector vs a line filter?</h3>
+  <p><button type="button" class="toggle-btn" data-toggle="feq-a-11">Reveal answer</button>
+     <button type="button" class="toggle-btn" data-complete="questions" data-cid="feq-11">Mark complete</button></p>
+  <div class="reveal" id="feq-a-11">
+    <p><b>Short answer.</b> Selector picks streams (labels). Line filter then greps the payload. JSON unpack is after that.</p>
+    <p><b>Deep explanation.</b> The logging plugin schema switch (viaq vs OTel) changes field names. Inventing {app=} on the wrong schema returns empty, not an error you can see.</p>
+    
+    <p><b>Common misconception.</b> LogQL is grep on every node disk.</p>
+    <p><b>Follow-up.</b> Why might a filter that worked last year return nothing after OTel migration?</p>
+  </div>
+</article>
+<article class="q" id="feq-12" data-level="query" data-cat="traceql" data-search="What is TraceQL for?" data-stype="Interview question" data-mock="1">
+  <div class="meta-row"><span class="badge badge-js">query</span><span class="chip">traceql</span><span class="chip">Q12</span></div>
+  <h3>12. What is TraceQL for?</h3>
+  <p><button type="button" class="toggle-btn" data-toggle="feq-a-12">Reveal answer</button>
+     <button type="button" class="toggle-btn" data-complete="questions" data-cid="feq-12">Mark complete</button></p>
+  <div class="reveal" id="feq-a-12">
+    <p><b>Short answer.</b> Find traces in Tempo by service, duration, status, attributes — then open a waterfall.</p>
+    <p><b>Deep explanation.</b> OTel semantic conventions (service.name, k8s, http) are the join keys with metrics and logs. Exemplars can jump metric → trace.</p>
+    
+    <p><b>Common misconception.</b> Jaeger is the current OpenShift tracing UI.</p>
+    <p><b>Follow-up.</b> When is a trace the wrong first click?</p>
+  </div>
+</article>
+<article class="q" id="feq-13" data-level="perses" data-cat="dashboards" data-search="Why Perses instead of ‘just Grafana’ on this stack?" data-stype="Interview question" data-mock="1">
+  <div class="meta-row"><span class="badge badge-js">perses</span><span class="chip">dashboards</span><span class="chip">Q13</span></div>
+  <h3>13. Why Perses instead of ‘just Grafana’ on this stack?</h3>
+  <p><button type="button" class="toggle-btn" data-toggle="feq-a-13">Reveal answer</button>
+     <button type="button" class="toggle-btn" data-complete="questions" data-cid="feq-13">Mark complete</button></p>
+  <div class="reveal" id="feq-a-13">
+    <p><b>Short answer.</b> Dashboards and datasources are namespace-scoped CRs — RBAC and GitOps. COO wires Observe → Dashboards (Perses).</p>
+    <p><b>Deep explanation.</b> Grafana import exists as a migration. Visualization direction is Perses + PatternFly theming in monitoring-plugin, not a new Grafana plugin career.</p>
+    
+    <p><b>Common misconception.</b> Perses is a Grafana fork you must re-skin by hand.</p>
+    <p><b>Follow-up.</b> Where does a Perses dashboard live as an object?</p>
+  </div>
+</article>
+<article class="q" id="feq-14" data-level="korrel8r" data-cat="correlation" data-search="What does Korrel8r do for the troubleshooting panel?" data-stype="Interview question" data-mock="1">
+  <div class="meta-row"><span class="badge badge-js">korrel8r</span><span class="chip">correlation</span><span class="chip">Q14</span></div>
+  <h3>14. What does Korrel8r do for the troubleshooting panel?</h3>
+  <p><button type="button" class="toggle-btn" data-toggle="feq-a-14">Reveal answer</button>
+     <button type="button" class="toggle-btn" data-complete="questions" data-cid="feq-14">Mark complete</button></p>
+  <div class="reveal" id="feq-a-14">
+    <p><b>Short answer.</b> Rules connect alerts, metrics, logs, pods, netflows. The panel draws a graph and maps clicks to console URLs.</p>
+    <p><b>Deep explanation.</b> If Logging is missing, log nodes will not be useful. URL maps need unit tests — a pretty graph with a 404 is a silent product bug.</p>
+    
+    <p><b>Common misconception.</b> Korrel8r is a replacement for Prometheus.</p>
+    <p><b>Follow-up.</b> What repo owns the OpenShift URL mapping?</p>
+  </div>
+</article>
+<article class="q" id="feq-15" data-level="ops" data-cat="cmo" data-search="CMO vs COO in one minute." data-stype="Interview question" data-mock="1">
+  <div class="meta-row"><span class="badge badge-js">ops</span><span class="chip">cmo</span><span class="chip">Q15</span></div>
+  <h3>15. CMO vs COO in one minute.</h3>
+  <p><button type="button" class="toggle-btn" data-toggle="feq-a-15">Reveal answer</button>
+     <button type="button" class="toggle-btn" data-complete="questions" data-cid="feq-15">Mark complete</button></p>
+  <div class="reveal" id="feq-a-15">
+    <p><b>Short answer.</b> CMO is the default in-cluster Prometheus stack. COO is the meta-operator that adds optional Observe UIs, Perses, incidents, ACM wiring.</p>
+    <p><b>Deep explanation.</b> Users still live under Observe. COO installs plugins from UIPlugin. CMO still answers ‘is cluster monitoring on?’</p>
+    
+    <p><b>Common misconception.</b> COO replaced Prometheus.</p>
+    <p><b>Follow-up.</b> Which operator do you talk to if Perses is missing?</p>
+  </div>
+</article>
+<article class="q" id="feq-16" data-level="ops" data-cat="gitops" data-search="A plugin was enabled yesterday and is gone today. First question?" data-stype="Interview question" data-mock="1">
+  <div class="meta-row"><span class="badge badge-js">ops</span><span class="chip">gitops</span><span class="chip">Q16</span></div>
+  <h3>16. A plugin was enabled yesterday and is gone today. First question?</h3>
+  <p><button type="button" class="toggle-btn" data-toggle="feq-a-16">Reveal answer</button>
+     <button type="button" class="toggle-btn" data-complete="questions" data-cid="feq-16">Mark complete</button></p>
+  <div class="reveal" id="feq-a-16">
+    <p><b>Short answer.</b> Does GitOps own the Console CR? If yes, the name must be in git spec.plugins.</p>
+    <p><b>Deep explanation.</b> A UI toggle without git is a race. Looks like a frontend regression. Check operators and Console spec before Webpack.</p>
+    
+    <p><b>Common misconception.</b> Always a bad webpack build.</p>
+    <p><b>Follow-up.</b> Where do you look besides the plugin Deployment?</p>
+  </div>
+</article>
+<article class="q" id="feq-17" data-level="senior" data-cat="lead" data-search="What does ‘lead the UI’ mean here if you are not rewriting the console?" data-stype="Interview question" data-mock="1">
+  <div class="meta-row"><span class="badge badge-js">senior</span><span class="chip">lead</span><span class="chip">Q17</span></div>
+  <h3>17. What does ‘lead the UI’ mean here if you are not rewriting the console?</h3>
+  <p><button type="button" class="toggle-btn" data-toggle="feq-a-17">Reveal answer</button>
+     <button type="button" class="toggle-btn" data-complete="questions" data-cid="feq-17">Mark complete</button></p>
+  <div class="reveal" id="feq-a-17">
+    <p><b>Short answer.</b> Propose plugin boundaries, proxies, feature flags, and PF patterns — then land them upstream.</p>
+    <p><b>Deep explanation.</b> You sit between signal teams, PM, and UX. Empty states and RBAC-aware lists are the product. A new SPA is usually the wrong architecture.</p>
+    
+    <p><b>Common misconception.</b> Lead means pick the chart library.</p>
+    <p><b>Follow-up.</b> What artifact would you write before week 6?</p>
+  </div>
+</article>
+<article class="q" id="feq-18" data-level="senior" data-cat="upstream" data-search="What does ‘own it through upstream’ imply for a PR?" data-stype="Interview question" data-mock="1">
+  <div class="meta-row"><span class="badge badge-js">senior</span><span class="chip">upstream</span><span class="chip">Q18</span></div>
+  <h3>18. What does ‘own it through upstream’ imply for a PR?</h3>
+  <p><button type="button" class="toggle-btn" data-toggle="feq-a-18">Reveal answer</button>
+     <button type="button" class="toggle-btn" data-complete="questions" data-cid="feq-18">Mark complete</button></p>
+  <div class="reveal" id="feq-a-18">
+    <p><b>Short answer.</b> The feature lands on GitHub first (DCO sign-off, OWNERS), then in the operator that installs it.</p>
+    <p><b>Deep explanation.</b> Downstream-only patches surprise the next rebase. Know backport norms. Tiny docs/test PRs teach the machine before a large UI change.</p>
+    
+    <p><b>Common misconception.</b> Ship only on the internal fork.</p>
+    <p><b>Follow-up.</b> What is Signed-off-by for?</p>
+  </div>
+</article>
+<article class="q" id="feq-19" data-level="senior" data-cat="review" data-search="Name three review comments that are senior, not style nits." data-stype="Interview question" data-mock="1">
+  <div class="meta-row"><span class="badge badge-js">senior</span><span class="chip">review</span><span class="chip">Q19</span></div>
+  <h3>19. Name three review comments that are senior, not style nits.</h3>
+  <p><button type="button" class="toggle-btn" data-toggle="feq-a-19">Reveal answer</button>
+     <button type="button" class="toggle-btn" data-complete="questions" data-cid="feq-19">Mark complete</button></p>
+  <div class="reveal" id="feq-a-19">
+    <p><b>Short answer.</b> PF misuse, unbounded fetch/cardinality, missing i18n or a11y, proxy vs hardcoded service, GitOps Console spec.</p>
+    <p><b>Deep explanation.</b> Lint is table stakes. You catch silent no-ops: URL maps, feature flags, empty/error/partial query states.</p>
+    
+    <p><b>Common misconception.</b> Rename a variable and approve.</p>
+    <p><b>Follow-up.</b> What would you block a merge for on a chart PR?</p>
+  </div>
+</article>
+<article class="q" id="feq-20" data-level="plugin" data-cat="i18n" data-search="Why are hard-coded English strings a review block?" data-stype="Interview question" data-mock="1">
+  <div class="meta-row"><span class="badge badge-js">plugin</span><span class="chip">i18n</span><span class="chip">Q20</span></div>
+  <h3>20. Why are hard-coded English strings a review block?</h3>
+  <p><button type="button" class="toggle-btn" data-toggle="feq-a-20">Reveal answer</button>
+     <button type="button" class="toggle-btn" data-complete="questions" data-cid="feq-20">Mark complete</button></p>
+  <div class="reveal" id="feq-a-20">
+    <p><b>Short answer.</b> Console plugins are translated with react-i18next. English in a header skips that pipeline.</p>
+    <p><b>Deep explanation.</b> Keys live with the plugin. You will see this on every sibling repo. Treat it as part of Done.</p>
+    
+    <p><b>Common misconception.</b> English-only is fine for an internal plugin.</p>
+    <p><b>Follow-up.</b> Where do you look for existing keys before adding a new one?</p>
+  </div>
+</article>
+<article class="q" id="feq-21" data-level="signals" data-cat="incidents" data-search="What is the incidents surface for?" data-stype="Interview question" data-mock="1">
+  <div class="meta-row"><span class="badge badge-js">signals</span><span class="chip">incidents</span><span class="chip">Q21</span></div>
+  <h3>21. What is the incidents surface for?</h3>
+  <p><button type="button" class="toggle-btn" data-toggle="feq-a-21">Reveal answer</button>
+     <button type="button" class="toggle-btn" data-complete="questions" data-cid="feq-21">Mark complete</button></p>
+  <div class="reveal" id="feq-a-21">
+    <p><b>Short answer.</b> Group alert bursts into a timeline so humans are not staring at 4000 raw alerts.</p>
+    <p><b>Deep explanation.</b> It is a COO cluster-health feature, not a replacement for Alertmanager. Start here when ‘everything is on fire.’</p>
+    
+    <p><b>Common misconception.</b> Incidents replace Prometheus rules.</p>
+    <p><b>Follow-up.</b> When do you still open Alertmanager / metrics?</p>
+  </div>
+</article>
+<article class="q" id="feq-22" data-level="query" data-cat="otel" data-search="What OpenTelemetry pieces should a UI engineer actually know?" data-stype="Interview question" data-mock="1">
+  <div class="meta-row"><span class="badge badge-js">query</span><span class="chip">otel</span><span class="chip">Q22</span></div>
+  <h3>22. What OpenTelemetry pieces should a UI engineer actually know?</h3>
+  <p><button type="button" class="toggle-btn" data-toggle="feq-a-22">Reveal answer</button>
+     <button type="button" class="toggle-btn" data-complete="questions" data-cid="feq-22">Mark complete</button></p>
+  <div class="reveal" id="feq-a-22">
+    <p><b>Short answer.</b> Semantic conventions, collector as the pipeline, Tempo as the store, exemplars as metric→trace jumps.</p>
+    <p><b>Deep explanation.</b> You do not need to write the collector config on day 1. You do need to know why service.name is the join key and why Jaeger is legacy talk.</p>
+    
+    <p><b>Common misconception.</b> OTel is a React library.</p>
+    <p><b>Follow-up.</b> Name one attribute you would show on a trace search row.</p>
+  </div>
+</article>
+<article class="q" id="feq-23" data-level="perses" data-cat="grafana" data-search="How should you talk about Grafana in this codebase?" data-stype="Interview question" data-mock="1">
+  <div class="meta-row"><span class="badge badge-js">perses</span><span class="chip">grafana</span><span class="chip">Q23</span></div>
+  <h3>23. How should you talk about Grafana in this codebase?</h3>
+  <p><button type="button" class="toggle-btn" data-toggle="feq-a-23">Reveal answer</button>
+     <button type="button" class="toggle-btn" data-complete="questions" data-cid="feq-23">Mark complete</button></p>
+  <div class="reveal" id="feq-a-23">
+    <p><b>Short answer.</b> Import path and migration story. Do not become a Grafana plugin author as the plan.</p>
+    <p><b>Deep explanation.</b> Perses is the Kubernetes-native board. Grafana JSON in is a bridge. Know that the conversation exists.</p>
+    
+    <p><b>Common misconception.</b> Grafana is the Observe dashboards page.</p>
+    <p><b>Follow-up.</b> What object type would you GitOps instead of a Grafana folder?</p>
+  </div>
+</article>
+<article class="q" id="feq-24" data-level="korrel8r" data-cat="ux" data-search="Why can a Korrel8r graph look ‘done’ and still be a P1?" data-stype="Interview question" data-mock="1">
+  <div class="meta-row"><span class="badge badge-js">korrel8r</span><span class="chip">ux</span><span class="chip">Q24</span></div>
+  <h3>24. Why can a Korrel8r graph look ‘done’ and still be a P1?</h3>
+  <p><button type="button" class="toggle-btn" data-toggle="feq-a-24">Reveal answer</button>
+     <button type="button" class="toggle-btn" data-complete="questions" data-cid="feq-24">Mark complete</button></p>
+  <div class="reveal" id="feq-a-24">
+    <p><b>Short answer.</b> Clicks must land on the right Observe page with the right query. Wrong href is silent.</p>
+    <p><b>Deep explanation.</b> Extensive URL-map tests exist for a reason. Missing sibling plugins (logging) need honest empty copy.</p>
+    
+    <p><b>Common misconception.</b> If the graph renders, the product works.</p>
+    <p><b>Follow-up.</b> What would you test besides snapshotting SVG positions?</p>
+  </div>
+</article>
+</section>
+
+<section class="block" id="drills" data-search="Exercises Observe UI sketches" data-stype="Section">
+  <p class="kicker">8 sketches</p>
+  <h2 class="section-title">Exercises</h2>
+  <p class="lede">Write on paper first. Reveal after you have YAML or PromQL, not before. Mark complete when you can redo it from a blank page.</p>
+  <div class="callout">Original teaching drills — not claimed employer questions.</div>
+  
+<article class="problem" id="ex-consoleplugin" data-pid="ex-consoleplugin" data-search="Sketch a ConsolePlugin CR" data-stype="Topic problem" data-cat="plugin" data-level="easy" data-mock="1">
+  <div class="meta-row"><span class="badge badge-easy">easy</span><span class="chip">plugin</span><span class="chip">CR + proxy</span><span class="badge badge-pattern">Topic practice</span></div>
+  <h3>1. Sketch a ConsolePlugin CR</h3>
+  <p>Write YAML: plugin name, backend service, one Loki proxy with UserToken. Then say how an admin enables it.</p>
+  <p><button type="button" class="toggle-btn" data-toggle="ex-consoleplugin-a">Reveal solution</button>
+     <button type="button" class="toggle-btn" data-complete="designs" data-cid="ex-consoleplugin">Mark complete</button></p>
+  <div class="reveal" id="ex-consoleplugin-a">
+    <p><b>Idea.</b> ConsolePlugin is console.openshift.io/v1. Enable via console Operator spec.plugins. Proxy is how the browser reaches Loki.</p>
+    <div class="code-block"><div class="code-head"><span>text</span><button type="button" class="copy-btn">Copy</button></div><pre><code>apiVersion: console.openshift.io/v1
+kind: ConsolePlugin
+metadata:
+  name: example-observe
+spec:
+  displayName: Example Observe
+  backend:
+    service:
+      name: example-plugin
+      namespace: example
+      port: 9443
+  proxy:
+    - objectRef:
+        name: loki
+        namespace: openshift-logging
+        kind: Service
+      authorization: UserToken
+# enable: Console spec.plugins += example-observe</code></pre></div>
+    <p><b>Why it matters.</b> Wrong API group or skipping spec.plugins. &nbsp; <b>Watch.</b> Hard-coding the Loki URL in fetch().</p>
+  </div>
+  <div class="status-btns">
+    <button type="button" data-status="not-started">Not Started</button>
+    <button type="button" data-status="attempted">Attempted</button>
+    <button type="button" data-status="solved">Solved</button>
+    <button type="button" data-status="review">Review</button>
+    <button type="button" data-status="mastered">Mastered</button>
+  </div>
+</article>
+
+<article class="problem" id="ex-uiplugin" data-pid="ex-uiplugin" data-search="Sketch a UIPlugin that turns Perses on" data-stype="Topic problem" data-cat="ops" data-level="easy" data-mock="1">
+  <div class="meta-row"><span class="badge badge-easy">easy</span><span class="chip">ops</span><span class="chip">COO CR</span><span class="badge badge-pattern">Topic practice</span></div>
+  <h3>2. Sketch a UIPlugin that turns Perses on</h3>
+  <p>Write the smallest UIPlugin that enables Perses under Monitoring. Say which operator consumes it.</p>
+  <p><button type="button" class="toggle-btn" data-toggle="ex-uiplugin-a">Reveal solution</button>
+     <button type="button" class="toggle-btn" data-complete="designs" data-cid="ex-uiplugin">Mark complete</button></p>
+  <div class="reveal" id="ex-uiplugin-a">
+    <p><b>Idea.</b> observability.openshift.io UIPlugin, type Monitoring, monitoring.perses.enabled. COO deploys the bits.</p>
+    <div class="code-block"><div class="code-head"><span>text</span><button type="button" class="copy-btn">Copy</button></div><pre><code>apiVersion: observability.openshift.io/v1alpha1
+kind: UIPlugin
+metadata:
+  name: monitoring
+spec:
+  type: Monitoring
+  monitoring:
+    perses:
+      enabled: true</code></pre></div>
+    <p><b>Why it matters.</b> Putting this on the Console CR instead of COO. &nbsp; <b>Watch.</b> Assuming Grafana appears automatically.</p>
+  </div>
+  <div class="status-btns">
+    <button type="button" data-status="not-started">Not Started</button>
+    <button type="button" data-status="attempted">Attempted</button>
+    <button type="button" data-status="solved">Solved</button>
+    <button type="button" data-status="review">Review</button>
+    <button type="button" data-status="mastered">Mastered</button>
+  </div>
+</article>
+
+<article class="problem" id="ex-promql" data-pid="ex-promql" data-search="5xx ratio PromQL" data-stype="Topic problem" data-cat="query" data-level="medium" data-mock="1">
+  <div class="meta-row"><span class="badge badge-medium">medium</span><span class="chip">query</span><span class="chip">rate + ratio</span><span class="badge badge-pattern">Topic practice</span></div>
+  <h3>3. 5xx ratio PromQL</h3>
+  <p>Write PromQL for 5xx / all requests over 5m, summed across instances. No user-id label.</p>
+  <p><button type="button" class="toggle-btn" data-toggle="ex-promql-a">Reveal solution</button>
+     <button type="button" class="toggle-btn" data-complete="designs" data-cid="ex-promql">Mark complete</button></p>
+  <div class="reveal" id="ex-promql-a">
+    <p><b>Idea.</b> rate() on a counter. Filter 5xx in the numerator. Same grouping in num and den.</p>
+    <div class="code-block"><div class="code-head"><span>text</span><button type="button" class="copy-btn">Copy</button></div><pre><code>sum(rate(http_requests_total{code=~&quot;5..&quot;}[5m]))
+/
+sum(rate(http_requests_total[5m]))</code></pre></div>
+    <p><b>Why it matters.</b> Plotting the raw counter. Grouping by user. &nbsp; <b>Watch.</b> irate() on an SLO graph.</p>
+  </div>
+  <div class="status-btns">
+    <button type="button" data-status="not-started">Not Started</button>
+    <button type="button" data-status="attempted">Attempted</button>
+    <button type="button" data-status="solved">Solved</button>
+    <button type="button" data-status="review">Review</button>
+    <button type="button" data-status="mastered">Mastered</button>
+  </div>
+</article>
+
+<article class="problem" id="ex-logql" data-pid="ex-logql" data-search="Namespace error LogQL" data-stype="Topic problem" data-cat="query" data-level="medium" data-mock="1">
+  <div class="meta-row"><span class="badge badge-medium">medium</span><span class="chip">query</span><span class="chip">selector then filter</span><span class="badge badge-pattern">Topic practice</span></div>
+  <h3>4. Namespace error LogQL</h3>
+  <p>Logs for namespace shop, container checkout, lines containing error. Mention viaq vs OTel as a risk.</p>
+  <p><button type="button" class="toggle-btn" data-toggle="ex-logql-a">Reveal solution</button>
+     <button type="button" class="toggle-btn" data-complete="designs" data-cid="ex-logql">Mark complete</button></p>
+  <div class="reveal" id="ex-logql-a">
+    <p><b>Idea.</b> Stream selector first, then |=. Field names depend on schema.</p>
+    <div class="code-block"><div class="code-head"><span>text</span><button type="button" class="copy-btn">Copy</button></div><pre><code>{kubernetes_namespace_name=&quot;shop&quot;, app=&quot;checkout&quot;} |= &quot;error&quot;
+# if empty: check viaq vs OTel label names</code></pre></div>
+    <p><b>Why it matters.</b> Regex over every tenant. &nbsp; <b>Watch.</b> Assuming {app=} exists on both schemas.</p>
+  </div>
+  <div class="status-btns">
+    <button type="button" data-status="not-started">Not Started</button>
+    <button type="button" data-status="attempted">Attempted</button>
+    <button type="button" data-status="solved">Solved</button>
+    <button type="button" data-status="review">Review</button>
+    <button type="button" data-status="mastered">Mastered</button>
+  </div>
+</article>
+
+<article class="problem" id="ex-pf-empty" data-pid="ex-pf-empty" data-search="Empty and error states" data-stype="Topic problem" data-cat="patternfly" data-level="easy" data-mock="1">
+  <div class="meta-row"><span class="badge badge-easy">easy</span><span class="chip">patternfly</span><span class="chip">EmptyState + live region</span><span class="badge badge-pattern">Topic practice</span></div>
+  <h3>5. Empty and error states</h3>
+  <p>List the PF pieces and a11y for: no rows, query timeout, partial series.</p>
+  <p><button type="button" class="toggle-btn" data-toggle="ex-pf-empty-a">Reveal solution</button>
+     <button type="button" class="toggle-btn" data-complete="designs" data-cid="ex-pf-empty">Mark complete</button></p>
+  <div class="reveal" id="ex-pf-empty-a">
+    <p><b>Idea.</b> EmptyState for zero. Inline alert + live region for timeout. Partial: show what you have and say what dropped.</p>
+    <div class="code-block"><div class="code-head"><span>text</span><button type="button" class="copy-btn">Copy</button></div><pre><code>no rows     → EmptyState (title, body, optional action)
+timeout     → Alert + aria-live polite
+partial     → table + ‘12 series dropped’</code></pre></div>
+    <p><b>Why it matters.</b> A spinner forever. &nbsp; <b>Watch.</b> Color-only red banner.</p>
+  </div>
+  <div class="status-btns">
+    <button type="button" data-status="not-started">Not Started</button>
+    <button type="button" data-status="attempted">Attempted</button>
+    <button type="button" data-status="solved">Solved</button>
+    <button type="button" data-status="review">Review</button>
+    <button type="button" data-status="mastered">Mastered</button>
+  </div>
+</article>
+
+<article class="problem" id="ex-journey" data-pid="ex-journey" data-search="One request, three signals" data-stype="Topic problem" data-cat="signals" data-level="medium" data-mock="1">
+  <div class="meta-row"><span class="badge badge-medium">medium</span><span class="chip">signals</span><span class="chip">join keys</span><span class="badge badge-pattern">Topic practice</span></div>
+  <h3>6. One request, three signals</h3>
+  <p>A checkout request is slow. Write the click path: metric → trace → logs. Name the join keys.</p>
+  <p><button type="button" class="toggle-btn" data-toggle="ex-journey-a">Reveal solution</button>
+     <button type="button" class="toggle-btn" data-complete="designs" data-cid="ex-journey">Mark complete</button></p>
+  <div class="reveal" id="ex-journey-a">
+    <p><b>Idea.</b> p99 or error ratio → Tempo by service.name / trace id (exemplar) → Loki by namespace + trace id if present.</p>
+    <div class="code-block"><div class="code-head"><span>text</span><button type="button" class="copy-btn">Copy</button></div><pre><code>Metrics:  histogram_quantile or error ratio (service=checkout)
+Traces:   TraceQL resource.service.name + duration
+Logs:     namespace shop + trace_id if the collector injects it</code></pre></div>
+    <p><b>Why it matters.</b> Three unlinked dump pages. &nbsp; <b>Watch.</b> Starting in Jaeger because of a 2021 blog.</p>
+  </div>
+  <div class="status-btns">
+    <button type="button" data-status="not-started">Not Started</button>
+    <button type="button" data-status="attempted">Attempted</button>
+    <button type="button" data-status="solved">Solved</button>
+    <button type="button" data-status="review">Review</button>
+    <button type="button" data-status="mastered">Mastered</button>
+  </div>
+</article>
+
+<article class="problem" id="ex-korrel8r" data-pid="ex-korrel8r" data-search="URL map test" data-stype="Topic problem" data-cat="korrel8r" data-level="medium" data-mock="1">
+  <div class="meta-row"><span class="badge badge-medium">medium</span><span class="chip">korrel8r</span><span class="chip">href contract</span><span class="badge badge-pattern">Topic practice</span></div>
+  <h3>7. URL map test</h3>
+  <p>Write in words the test you would add when Observe log route changes.</p>
+  <p><button type="button" class="toggle-btn" data-toggle="ex-korrel8r-a">Reveal solution</button>
+     <button type="button" class="toggle-btn" data-complete="designs" data-cid="ex-korrel8r">Mark complete</button></p>
+  <div class="reveal" id="ex-korrel8r-a">
+    <p><b>Idea.</b> Given an alert neighbour of type log, expect href host + path + query. Fail CI if the plugin route renamed.</p>
+    <div class="code-block"><div class="code-head"><span>text</span><button type="button" class="copy-btn">Copy</button></div><pre><code>given: korrel8r node {domain: log, query: ...}
+expect: /observe/logs?q=...   (or current plugin path)
+assert: logging plugin missing → explicit empty copy, not 404</code></pre></div>
+    <p><b>Why it matters.</b> Screenshot tests of the graph only. &nbsp; <b>Watch.</b> Assuming sibling plugins are always installed.</p>
+  </div>
+  <div class="status-btns">
+    <button type="button" data-status="not-started">Not Started</button>
+    <button type="button" data-status="attempted">Attempted</button>
+    <button type="button" data-status="solved">Solved</button>
+    <button type="button" data-status="review">Review</button>
+    <button type="button" data-status="mastered">Mastered</button>
+  </div>
+</article>
+
+<article class="problem" id="ex-gitops" data-pid="ex-gitops" data-search="Plugin disappeared" data-stype="Topic problem" data-cat="ops" data-level="easy" data-mock="1">
+  <div class="meta-row"><span class="badge badge-easy">easy</span><span class="chip">ops</span><span class="chip">Console spec</span><span class="badge badge-pattern">Topic practice</span></div>
+  <h3>8. Plugin disappeared</h3>
+  <p>Checklist: three places to look before blaming Webpack.</p>
+  <p><button type="button" class="toggle-btn" data-toggle="ex-gitops-a">Reveal solution</button>
+     <button type="button" class="toggle-btn" data-complete="designs" data-cid="ex-gitops">Mark complete</button></p>
+  <div class="reveal" id="ex-gitops-a">
+    <p><b>Idea.</b> Console CR spec.plugins (git). UIPlugin / COO. Plugin Deployment / Route. Then webpack.</p>
+    <div class="code-block"><div class="code-head"><span>text</span><button type="button" class="copy-btn">Copy</button></div><pre><code>1. Console spec.plugins in git (GitOps won)
+2. UIPlugin + COO status
+3. Plugin pod / service
+4. Then browser: remote entry 404</code></pre></div>
+    <p><b>Why it matters.</b> Only Chrome DevTools network tab. &nbsp; <b>Watch.</b> Re-enabling in UI without committing.</p>
+  </div>
+  <div class="status-btns">
+    <button type="button" data-status="not-started">Not Started</button>
+    <button type="button" data-status="attempted">Attempted</button>
+    <button type="button" data-status="solved">Solved</button>
+    <button type="button" data-status="review">Review</button>
+    <button type="button" data-status="mastered">Mastered</button>
+  </div>
+</article>
+
+</section>
+
+<section class="block" id="mock" data-search="Teach-back timed practice" data-stype="Section">
+  <p class="kicker">Timed practice</p>
+  <h2 class="section-title">Teach-back</h2>
+  <p class="lede">Draws a random Q&amp;A or exercise (<code>data-mock</code>). Speak: plugin or query → empty/error state → what you would not build. Reveal after you have an approach. Save a debrief.</p>
+  <div class="card" style="margin-bottom:16px">
+    <p>Category
+      <select id="mock-cat">
+        <option value="all">All</option>
+        <option value="console">console</option>
+        <option value="ui">ui</option>
+        <option value="domain">domain</option>
+        <option value="promql">promql</option>
+        <option value="logql">logql</option>
+        <option value="traceql">traceql</option>
+        <option value="dashboards">dashboards</option>
+        <option value="correlation">correlation</option>
+        <option value="cmo">cmo</option>
+        <option value="gitops">gitops</option>
+        <option value="lead">lead</option>
+        <option value="upstream">upstream</option>
+        <option value="review">review</option>
+        <option value="plugin">plugin</option>
+        <option value="ops">ops</option>
+        <option value="query">query</option>
+        <option value="signals">signals</option>
+        <option value="patternfly">patternfly</option>
+        <option value="korrel8r">korrel8r</option>
+      </select>
+    </p>
+    <div class="status-btns">
+      <button type="button" class="toggle-btn" data-start-mock="15">15-min question</button>
+      <button type="button" class="toggle-btn" data-start-mock="30">30-min sketch</button>
+      <button type="button" class="toggle-btn" data-start-mock="45">45-min design</button>
+      <button type="button" class="toggle-btn" data-start-mock="60">60-min teach-back</button>
+    </div>
+    <div id="mock-panel"><p class="stat-sub">Pick a duration. Narrate before you type. Reveal only after you have a plugin/query choice and an empty-state.</p></div>
+  </div>
+  <div class="card">
+    <h3>Debrief rubric</h3>
+    <label class="task"><input type="checkbox" id="mock-q-trade" /> <span>I named a plugin boundary or query, not a new SPA</span></label>
+    <label class="task"><input type="checkbox" id="mock-q-time" /> <span>I named empty, error, and partial-query states</span></label>
+    <label class="task"><input type="checkbox" id="mock-q-a11y" /> <span>I named PatternFly / a11y or cardinality, not only the happy chart</span></label>
+    <p>Notes<br /><textarea id="mock-notes" rows="3" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:inherit"></textarea></p>
+    <p>Confidence
+      <select id="mock-confidence">
+        <option value="1">1</option><option value="2">2</option>
+        <option value="3" selected>3</option><option value="4">4</option><option value="5">5</option>
+      </select>
+    </p>
+    <p><button type="button" class="toggle-btn" id="save-mock">Save teach-back</button></p>
+  </div>
+  <div class="card" style="margin-top:16px"><h3>History</h3><div id="mock-history"></div></div>
+</section>
+
+<section class="block" id="progress" data-search="Progress Tracker before we start" data-stype="Section">
+  <p class="kicker">localStorage pre-start-v1</p>
+  <h2 class="section-title">Progress Tracker</h2>
+  <div class="grid grid-2">
+    <div class="card"><h3>Daily tasks</h3><p id="track-days">0</p></div>
+    <div class="card"><h3>Lessons</h3><p id="track-arch">0</p><div class="bar"><span id="bar-cat-arch"></span></div></div>
+    <div class="card"><h3>Practical studies</h3><p id="track-react">0</p><div class="bar"><span id="bar-cat-react"></span></div></div>
+    <div class="card"><h3>Q&amp;A</h3><p id="track-qs">0</p></div>
+    <div class="card"><h3>Exercises</h3><p id="track-sd">0</p><div class="bar"><span id="bar-cat-sd"></span></div></div>
+    <div class="card"><h3>Drills</h3><p id="track-ex">0</p></div>
+  </div>
+  <p style="margin-top:18px"><button type="button" class="danger-btn" id="reset-progress">Reset all progress on this guide</button></p>
+</section>
+<section class="block" id="revision" data-search="Revision spaced repetition" data-stype="Section">
+  <p class="kicker">Remember on purpose</p>
+  <h2 class="section-title">Revision System</h2>
+  <p class="lede">Completed items review at 1 → 3 → 7 → 14 → 30 days. Attempted/failed → tomorrow. Mastered parks at 30 days.</p>
+  <div class="grid grid-2">
+    <div class="card"><h3>Due today</h3><ul class="tight" id="rev-today"></ul></div>
+    <div class="card"><h3>Due this week</h3><ul class="tight" id="rev-week"></ul></div>
+    <div class="card"><h3>Recently failed</h3><ul class="tight" id="rev-failed"></ul></div>
+    <div class="card"><h3>Weak areas</h3><ul class="tight" id="rev-weak"></ul></div>
+    <div class="card"><h3>Mastered</h3><ul class="tight" id="rev-mastered"></ul></div>
+  </div>
+</section>
+
+<section class="block" id="readiness" data-search="readiness checklist before we start" data-stype="Section">
+  <p class="kicker">Gate</p>
+  <h2 class="section-title">Readiness checklist</h2>
+  <p class="lede">Check only if you can do it <i>today</i> without this file. Stay until ~85% and you can teach the plugin loop without notes.</p>
+  <p class="stat">Score: <span id="ready-score">0%</span></p>
+  <div class="bar"><span id="bar-ready-final"></span></div>
+  <p id="ready-gate" class="stat-sub"></p>
+  <h3>Plugins and install</h3><label class="task"><input type="checkbox" data-id="r-fed" data-group="readiness" /><span>Explain Webpack federation vs a new SPA in one minute</span></label><label class="task"><input type="checkbox" data-id="r-cr" data-group="readiness" /><span>Sketch a ConsolePlugin CR including spec.proxy from memory</span></label><label class="task"><input type="checkbox" data-id="r-enable" data-group="readiness" /><span>Say how spec.plugins and GitOps Console spec interact</span></label><label class="task"><input type="checkbox" data-id="r-uiplugin" data-group="readiness" /><span>Explain UIPlugin vs ConsolePlugin and which operator watches UIPlugin</span></label><label class="task"><input type="checkbox" data-id="r-go" data-group="readiness" /><span>Say why several Observe plugins ship a small Go server</span></label><label class="task"><input type="checkbox" data-id="r-template" data-group="readiness" /><span>Describe the console-plugin-template local loop without opening the README</span></label><h3>PatternFly and a11y</h3><label class="task"><input type="checkbox" data-id="r-pf6" data-group="readiness" /><span>Name why OCP 4.19+ plugins target PatternFly 6</span></label><label class="task"><input type="checkbox" data-id="r-css" data-group="readiness" /><span>Say why importing PatternFly CSS in a plugin is a defect</span></label><label class="task"><input type="checkbox" data-id="r-prefix" data-group="readiness" /><span>Prefix custom classes with the plugin name — give one example</span></label><label class="task"><input type="checkbox" data-id="r-axe" data-group="readiness" /><span>Run a keyboard pass + axe on a PF table and name two issues you would fix</span></label><label class="task"><input type="checkbox" data-id="r-i18n" data-group="readiness" /><span>Say where English strings must not live (react-i18next)</span></label><label class="task"><input type="checkbox" data-id="r-chart" data-group="readiness" /><span>Describe a chart that is not color-only</span></label><h3>Signals and queries</h3><label class="task"><input type="checkbox" data-id="r-three" data-group="readiness" /><span>Pick first signal for CrashLoop, p99, and 401 — and the second</span></label><label class="task"><input type="checkbox" data-id="r-cmo" data-group="readiness" /><span>CMO vs COO in one minute</span></label><label class="task"><input type="checkbox" data-id="r-promql" data-group="readiness" /><span>Write a 5xx ratio PromQL without a user-id label</span></label><label class="task"><input type="checkbox" data-id="r-logql" data-group="readiness" /><span>Write a namespace LogQL and name viaq vs OTel as a risk</span></label><label class="task"><input type="checkbox" data-id="r-traceql" data-group="readiness" /><span>Find a slow service in TraceQL and open a waterfall</span></label><label class="task"><input type="checkbox" data-id="r-card" data-group="readiness" /><span>Explain why high cardinality is a UI bug as well as a backend bug</span></label><label class="task"><input type="checkbox" data-id="r-abort" data-group="readiness" /><span>Say how you abort in-flight fetches when the time picker moves</span></label><h3>Perses, correlation, ops</h3><label class="task"><input type="checkbox" data-id="r-perses" data-group="readiness" /><span>Explain Perses dashboards as namespaced CRs vs a Grafana folder</span></label><label class="task"><input type="checkbox" data-id="r-import" data-group="readiness" /><span>Say what Grafana import is for (migration, not a career)</span></label><label class="task"><input type="checkbox" data-id="r-korr" data-group="readiness" /><span>Sketch Korrel8r: alert → neighbours → console URL</span></label><label class="task"><input type="checkbox" data-id="r-href" data-group="readiness" /><span>Say why a URL-map test is more important than a pretty graph</span></label><label class="task"><input type="checkbox" data-id="r-gitops" data-group="readiness" /><span>Debug a vanished plugin starting at GitOps Console spec</span></label><label class="task"><input type="checkbox" data-id="r-inc" data-group="readiness" /><span>Say when to open Incidents vs raw Alertmanager</span></label><h3>How you show up</h3><label class="task"><input type="checkbox" data-id="r-lead" data-group="readiness" /><span>Propose a plugin boundary, proxy, flag, and PF pattern — not a new SPA</span></label><label class="task"><input type="checkbox" data-id="r-up" data-group="readiness" /><span>Describe DCO / Signed-off-by and why GitHub-first matters</span></label><label class="task"><input type="checkbox" data-id="r-review" data-group="readiness" /><span>Leave a senior review comment: a11y, i18n, unbounded fetch, or PF misuse</span></label><label class="task"><input type="checkbox" data-id="r-arch" data-group="readiness" /><span>Write a one-page architecture: plugins, COO, signals, UX, upstream</span></label><label class="task"><input type="checkbox" data-id="r-teach" data-group="readiness" /><span>Teach ConsolePlugin + three signals to a rubber duck in 5 minutes from a blank page</span></label>
+</section>
+
+<section class="block" id="resources" data-search="Resource library Observe UI" data-stype="Section">
+  <p class="kicker">Public first</p>
+  <h2 class="section-title">Resource Library</h2>
+  <p class="lede">This HTML already contains the teaching. Links are public docs and GitHub. Practice items here are original teaching, not claimed company questions. Internal CI and downstream branches wait until you have accounts.</p>
+  <div class="callout">Vendor product docs are labeled optional. You do not need a subscription to finish the 30-day plan.</div>
+  <div class="grid grid-2">
+<article class="card" data-search="OpenShift console dynamic plugins" data-stype="Resource">
+  <div class="meta-row"><span class="badge badge-pattern">Primary</span></div>
+  <h3><a href="https://github.com/openshift/enhancements/blob/master/enhancements/console/dynamic-plugins.md" target="_blank" rel="noopener noreferrer">OpenShift console dynamic plugins</a></h3>
+  <p><b>Teaches.</b> How the console loads remote plugins.</p>
+  <p><b>Why open it.</b> Read once so ConsolePlugin is not magic.</p>
+  <p><b>Guide topic.</b> Plugins</p>
+</article>
+<article class="card" data-search="console-plugin-template" data-stype="Resource">
+  <div class="meta-row"><span class="badge badge-pattern">Primary</span></div>
+  <h3><a href="https://github.com/openshift/console-plugin-template" target="_blank" rel="noopener noreferrer">console-plugin-template</a></h3>
+  <p><b>Teaches.</b> Yarn, Webpack, start-console, extensions JSON.</p>
+  <p><b>Why open it.</b> This is the loop. Clone it in week 1.</p>
+  <p><b>Guide topic.</b> Plugins</p>
+</article>
+<article class="card" data-search="Dynamic plugin SDK" data-stype="Resource">
+  <div class="meta-row"><span class="badge badge-pattern">Primary</span></div>
+  <h3><a href="https://github.com/openshift/console/tree/master/frontend/packages/console-dynamic-plugin-sdk" target="_blank" rel="noopener noreferrer">Dynamic plugin SDK</a></h3>
+  <p><b>Teaches.</b> APIs plugins are allowed to use.</p>
+  <p><b>Why open it.</b> Prefer SDK wrappers over reinventing list pages.</p>
+  <p><b>Guide topic.</b> Plugins</p>
+</article>
+<article class="card" data-search="PatternFly 6" data-stype="Resource">
+  <div class="meta-row"><span class="badge badge-pattern">Primary</span></div>
+  <h3><a href="https://www.patternfly.org/get-started/design/" target="_blank" rel="noopener noreferrer">PatternFly 6</a></h3>
+  <p><b>Teaches.</b> House design system for the console.</p>
+  <p><b>Why open it.</b> Build three screens. Do not import PF CSS in the plugin.</p>
+  <p><b>Guide topic.</b> PatternFly</p>
+</article>
+<article class="card" data-search="PatternFly accessibility" data-stype="Resource">
+  <div class="meta-row"><span class="badge badge-pattern">Primary</span></div>
+  <h3><a href="https://www.patternfly.org/accessibility/about-accessibility/" target="_blank" rel="noopener noreferrer">PatternFly accessibility</a></h3>
+  <p><b>Teaches.</b> Keyboard, contrast, components that already have a11y.</p>
+  <p><b>Why open it.</b> Job-level bar, not a polish pass.</p>
+  <p><b>Guide topic.</b> PatternFly</p>
+</article>
+<article class="card" data-search="Prometheus querying" data-stype="Resource">
+  <div class="meta-row"><span class="badge badge-pattern">Primary</span></div>
+  <h3><a href="https://prometheus.io/docs/prometheus/latest/querying/basics/" target="_blank" rel="noopener noreferrer">Prometheus querying</a></h3>
+  <p><b>Teaches.</b> PromQL: rate, instant vs range, aggregations.</p>
+  <p><b>Why open it.</b> Ten queries on a real Prometheus beat twenty blog posts.</p>
+  <p><b>Guide topic.</b> Queries</p>
+</article>
+<article class="card" data-search="LogQL" data-stype="Resource">
+  <div class="meta-row"><span class="badge badge-pattern">Primary</span></div>
+  <h3><a href="https://grafana.com/docs/loki/latest/query/" target="_blank" rel="noopener noreferrer">LogQL</a></h3>
+  <p><b>Teaches.</b> Loki query language.</p>
+  <p><b>Why open it.</b> Selector first, then line filter, then unpack.</p>
+  <p><b>Guide topic.</b> Queries</p>
+</article>
+<article class="card" data-search="TraceQL" data-stype="Resource">
+  <div class="meta-row"><span class="badge badge-pattern">Primary</span></div>
+  <h3><a href="https://grafana.com/docs/tempo/latest/traceql/" target="_blank" rel="noopener noreferrer">TraceQL</a></h3>
+  <p><b>Teaches.</b> Tempo trace search.</p>
+  <p><b>Why open it.</b> Current tracing UI direction with OTel — not Jaeger-as-product.</p>
+  <p><b>Guide topic.</b> Queries</p>
+</article>
+<article class="card" data-search="OpenTelemetry semantic conventions" data-stype="Resource">
+  <div class="meta-row"><span class="badge badge-pattern">Primary</span></div>
+  <h3><a href="https://opentelemetry.io/docs/specs/semconv/" target="_blank" rel="noopener noreferrer">OpenTelemetry semantic conventions</a></h3>
+  <p><b>Teaches.</b> service.name, k8s, http join keys.</p>
+  <p><b>Why open it.</b> The glue between metrics, logs, and traces.</p>
+  <p><b>Guide topic.</b> Signals</p>
+</article>
+<article class="card" data-search="Perses" data-stype="Resource">
+  <div class="meta-row"><span class="badge badge-pattern">Primary</span></div>
+  <h3><a href="https://github.com/perses/perses" target="_blank" rel="noopener noreferrer">Perses</a></h3>
+  <p><b>Teaches.</b> Dashboards as code.</p>
+  <p><b>Why open it.</b> Create one YAML dashboard; try one Grafana import.</p>
+  <p><b>Guide topic.</b> Perses</p>
+</article>
+<article class="card" data-search="Korrel8r" data-stype="Resource">
+  <div class="meta-row"><span class="badge badge-pattern">Primary</span></div>
+  <h3><a href="https://github.com/korrel8r/korrel8r" target="_blank" rel="noopener noreferrer">Korrel8r</a></h3>
+  <p><b>Teaches.</b> Correlation engine.</p>
+  <p><b>Why open it.</b> Read the rule idea, then the troubleshooting panel.</p>
+  <p><b>Guide topic.</b> Correlation</p>
+</article>
+<article class="card" data-search="troubleshooting-panel-console-plugin" data-stype="Resource">
+  <div class="meta-row"><span class="badge badge-pattern">Primary</span></div>
+  <h3><a href="https://github.com/openshift/troubleshooting-panel-console-plugin" target="_blank" rel="noopener noreferrer">troubleshooting-panel-console-plugin</a></h3>
+  <p><b>Teaches.</b> Graph + URL maps + tests.</p>
+  <p><b>Why open it.</b> AGENTS.md in the repo is worth a pass.</p>
+  <p><b>Guide topic.</b> Correlation</p>
+</article>
+<article class="card" data-search="monitoring-plugin" data-stype="Resource">
+  <div class="meta-row"><span class="badge badge-pattern">Primary</span></div>
+  <h3><a href="https://github.com/openshift/monitoring-plugin" target="_blank" rel="noopener noreferrer">monitoring-plugin</a></h3>
+  <p><b>Teaches.</b> Metrics, alerting, Perses theming, incidents, ACM.</p>
+  <p><b>Why open it.</b> Largest Observe UI. Skim README and feature flags.</p>
+  <p><b>Guide topic.</b> Observe</p>
+</article>
+<article class="card" data-search="logging-view-plugin" data-stype="Resource">
+  <div class="meta-row"><span class="badge badge-pattern">Primary</span></div>
+  <h3><a href="https://github.com/openshift/logging-view-plugin" target="_blank" rel="noopener noreferrer">logging-view-plugin</a></h3>
+  <p><b>Teaches.</b> Log list, Loki proxy, schema switch.</p>
+  <p><b>Why open it.</b> Pairs with LogQL practice.</p>
+  <p><b>Guide topic.</b> Observe</p>
+</article>
+<article class="card" data-search="distributed-tracing-console-plugin" data-stype="Resource">
+  <div class="meta-row"><span class="badge badge-pattern">Primary</span></div>
+  <h3><a href="https://github.com/openshift/distributed-tracing-console-plugin" target="_blank" rel="noopener noreferrer">distributed-tracing-console-plugin</a></h3>
+  <p><b>Teaches.</b> React + Go, Tempo proxy.</p>
+  <p><b>Why open it.</b> See a hybrid plugin.</p>
+  <p><b>Guide topic.</b> Observe</p>
+</article>
+<article class="card" data-search="observability-operator" data-stype="Resource">
+  <div class="meta-row"><span class="badge badge-pattern">Primary</span></div>
+  <h3><a href="https://github.com/rhobs/observability-operator" target="_blank" rel="noopener noreferrer">observability-operator</a></h3>
+  <p><b>Teaches.</b> UIPlugin and how COO installs UI.</p>
+  <p><b>Why open it.</b> The CR that actually puts pages on a cluster.</p>
+  <p><b>Guide topic.</b> Ops</p>
+</article>
+<article class="card" data-search="OpenShift Cluster Observability Operator" data-stype="Resource">
+  <div class="meta-row"><span class="badge badge-opt">Optional</span></div>
+  <h3><a href="https://docs.openshift.com/container-platform/latest/observability/cluster_observability_operator/coo-overview.html" target="_blank" rel="noopener noreferrer">OpenShift Cluster Observability Operator</a></h3>
+  <p><b>Teaches.</b> Product docs for COO / Observe extras.</p>
+  <p><b>Why open it.</b> Use after you understand UIPlugin. Optional official docs.</p>
+  <p><b>Guide topic.</b> Ops</p>
+</article>
+<article class="card" data-search="OpenShift console plugins docs" data-stype="Resource">
+  <div class="meta-row"><span class="badge badge-opt">Optional</span></div>
+  <h3><a href="https://docs.openshift.com/container-platform/latest/web_console/dynamic-plugin/overview-dynamic-plugin.html" target="_blank" rel="noopener noreferrer">OpenShift console plugins docs</a></h3>
+  <p><b>Teaches.</b> Supported plugin model on OpenShift.</p>
+  <p><b>Why open it.</b> Pairs with the template README.</p>
+  <p><b>Guide topic.</b> Plugins</p>
+</article>
+<article class="card" data-search="DCO" data-stype="Resource">
+  <div class="meta-row"><span class="badge badge-pattern">Primary</span></div>
+  <h3><a href="https://developercertificate.org/" target="_blank" rel="noopener noreferrer">DCO</a></h3>
+  <p><b>Teaches.</b> Signed-off-by for upstream commits.</p>
+  <p><b>Why open it.</b> One tiny docs PR teaches the machine.</p>
+  <p><b>Guide topic.</b> Upstream</p>
+</article>
+<article class="card" data-search="Frontend system design on this hub" data-stype="Resource">
+  <div class="meta-row"><span class="badge badge-opt">Optional</span></div>
+  <h3><a href="frontend-system-design.html" target="_blank" rel="noopener noreferrer">Frontend system design on this hub</a></h3>
+  <p><b>Teaches.</b> Product design discipline you reuse for Observe pages.</p>
+  <p><b>Why open it.</b> Empty states and scoped v1 still apply.</p>
+  <p><b>Guide topic.</b> Design</p>
+</article></div>
+</section>
+
+<section class="block" id="glossary" data-search="Glossary Observe UI" data-stype="Section">
+  <p class="kicker">Language</p>
+  <h2 class="section-title">Glossary</h2>
+  <p><input id="glossary-filter" type="search" placeholder="Filter terms..." style="width:100%;max-width:360px;padding:8px 10px;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:inherit" /></p>
+  <div class="grid grid-2" style="margin-top:16px"><article class="card glossary-item" data-search="ACM"><h3>ACM</h3><p>Advanced Cluster Management. Multi-cluster; often Thanos for metrics and a different alerting path.</p></article><article class="card glossary-item" data-search="Alertmanager"><h3>Alertmanager</h3><p>Routes and groups Prometheus alerts. Incidents sit above raw alert floods.</p></article><article class="card glossary-item" data-search="CMO"><h3>CMO</h3><p>Cluster Monitoring Operator — default in-cluster Prometheus stack on OpenShift.</p></article><article class="card glossary-item" data-search="ConsolePlugin"><h3>ConsolePlugin</h3><p>CR that registers a dynamic plugin: assets service, optional proxy, display name.</p></article><article class="card glossary-item" data-search="COO"><h3>COO</h3><p>Cluster Observability Operator — installs optional Observe UIs, Perses, incidents, related backends.</p></article><article class="card glossary-item" data-search="CRC / OpenShift Local"><h3>CRC / OpenShift Local</h3><p>A laptop-sized OpenShift cluster for plugin loops.</p></article><article class="card glossary-item" data-search="DCO"><h3>DCO</h3><p>Developer Certificate of Origin. Commits need Signed-off-by for many OpenShift repos.</p></article><article class="card glossary-item" data-search="Dynamic plugin"><h3>Dynamic plugin</h3><p>Webpack 5 module federation: the console loads your JS at runtime.</p></article><article class="card glossary-item" data-search="Exemplar"><h3>Exemplar</h3><p>A trace id attached to a metric sample so the UI can jump metric → trace.</p></article><article class="card glossary-item" data-search="GitOps Console spec"><h3>GitOps Console spec</h3><p>If git owns the Console CR, plugin names must live there or a sync disables them.</p></article><article class="card glossary-item" data-search="Korrel8r"><h3>Korrel8r</h3><p>Correlation engine: rules that link alerts, metrics, logs, pods, netflows.</p></article><article class="card glossary-item" data-search="LogQL"><h3>LogQL</h3><p>Loki query language. Stream selector, then line filters, then unpack.</p></article><article class="card glossary-item" data-search="Loki / LokiStack"><h3>Loki / LokiStack</h3><p>Log store. Observe → Logs talks to it through a plugin proxy.</p></article><article class="card glossary-item" data-search="OTel"><h3>OTel</h3><p>OpenTelemetry: collector pipeline + semantic conventions. Not a React library.</p></article><article class="card glossary-item" data-search="OWNERS"><h3>OWNERS</h3><p>File that lists who can approve a repo area. Read it before you ping randomly.</p></article><article class="card glossary-item" data-search="PatternFly 6"><h3>PatternFly 6</h3><p>OpenShift console design system from 4.19+. Do not import its CSS in a plugin.</p></article><article class="card glossary-item" data-search="Perses"><h3>Perses</h3><p>Cloud-native dashboards as Kubernetes CRs. Observe → Dashboards (Perses).</p></article><article class="card glossary-item" data-search="PromQL"><h3>PromQL</h3><p>Prometheus query language. Instant vs range; rate on counters.</p></article><article class="card glossary-item" data-search="spec.plugins"><h3>spec.plugins</h3><p>Console Operator list of enabled dynamic plugins.</p></article><article class="card glossary-item" data-search="spec.proxy"><h3>spec.proxy</h3><p>ConsolePlugin field: console backend proxies to an in-cluster Service.</p></article><article class="card glossary-item" data-search="Tempo"><h3>Tempo</h3><p>Trace store used with the current tracing UI. Jaeger is legacy conversation.</p></article><article class="card glossary-item" data-search="Thanos"><h3>Thanos</h3><p>Long-term / multi-cluster metrics path (often with ACM).</p></article><article class="card glossary-item" data-search="TraceQL"><h3>TraceQL</h3><p>Tempo’s language to find traces by service, duration, attributes.</p></article><article class="card glossary-item" data-search="Troubleshooting panel"><h3>Troubleshooting panel</h3><p>Console graph UI over Korrel8r results; clicks must map to real routes.</p></article><article class="card glossary-item" data-search="UIPlugin"><h3>UIPlugin</h3><p>COO CR that selects which Observe UI extras to install.</p></article><article class="card glossary-item" data-search="viaq"><h3>viaq</h3><p>Legacy OpenShift logging schema. OTel schema is the other switch in the logs UI.</p></article><article class="card glossary-item" data-search="WCAG"><h3>WCAG</h3><p>Accessibility standard. Keyboard, contrast, name/role/value — in the job, not polish.</p></article></div>
+</section>
+
+  </main>
+</div>
+<button class="back-top" id="back-top" type="button" aria-label="Back to top">↑</button>
+<script>
+(function () {
+  "use strict";
+
+  const KEY = "pre-start-v1";
+  const defaultState = () => ({
+    theme: "dark",
+    navCollapsed: false,
+    checks: {},
+    topics: {},
+    reactTopics: {},
+    questions: {},
+    designs: {},
+    exercises: {},
+    mocks: [],
+    reviews: {},
+    readiness: {},
+    debugs: {},
+    items: {}
+  });
+
+  function load() {
+    try {
+      const raw = localStorage.getItem(KEY);
+      if (!raw) return defaultState();
+      return Object.assign(defaultState(), JSON.parse(raw));
+    } catch {
+      return defaultState();
+    }
+  }
+  function save(state) {
+    localStorage.setItem(KEY, JSON.stringify(state));
+  }
+  let state = load();
+
+  function $(sel, root) { return (root || document).querySelector(sel); }
+  function $$(sel, root) { return Array.from((root || document).querySelectorAll(sel)); }
+
+  function applyTheme() {
+    document.documentElement.setAttribute("data-theme", state.theme || "dark");
+  }
+  applyTheme();
+  const themeBtn = $("#theme-toggle");
+  if (themeBtn) {
+    themeBtn.addEventListener("click", () => {
+      state.theme = state.theme === "dark" ? "light" : "dark";
+      save(state);
+      applyTheme();
+    });
+  }
+
+  const sidebar = $(".sidebar");
+  const backdrop = $(".sidebar-backdrop");
+  const menuBtn = $("#menu-btn");
+  function isMobileNav() { return window.matchMedia("(max-width: 800px)").matches; }
+  function applyNavCollapsed() {
+    document.body.classList.toggle("nav-collapsed", !!state.navCollapsed);
+    if (menuBtn) {
+      menuBtn.setAttribute("aria-label", isMobileNav()
+        ? "Open menu"
+        : (state.navCollapsed ? "Show sidebar" : "Hide sidebar"));
+    }
+  }
+  function closeNav() {
+    sidebar && sidebar.classList.remove("open");
+    backdrop && backdrop.classList.remove("open");
+  }
+  function toggleNav() {
+    if (isMobileNav()) {
+      sidebar.classList.toggle("open");
+      backdrop.classList.toggle("open");
+      return;
+    }
+    state.navCollapsed = !state.navCollapsed;
+    save(state);
+    applyNavCollapsed();
+  }
+  applyNavCollapsed();
+  menuBtn && menuBtn.addEventListener("click", toggleNav);
+  const hideBtn = $("#sidebar-hide");
+  hideBtn && hideBtn.addEventListener("click", toggleNav);
+  backdrop && backdrop.addEventListener("click", closeNav);
+  $$(".sidebar a").forEach((a) => a.addEventListener("click", closeNav));
+
+  function findToggleTarget(btn) {
+    const id = btn.getAttribute("data-toggle");
+    if (!id) return null;
+    const root = btn.closest("#mock-panel") || btn.closest(".problem, .q, .ex, .topic, .pattern, .elq") || document;
+    return root.querySelector("#" + CSS.escape(id)) || document.getElementById(id);
+  }
+  function bindToggles(scope) {
+    $$("[data-toggle]", scope).forEach((btn) => {
+      if (btn.dataset.boundToggle) return;
+      btn.dataset.boundToggle = "1";
+      btn.addEventListener("click", () => {
+        const el = findToggleTarget(btn);
+        if (el) el.classList.toggle("open");
+      });
+    });
+  }
+  function bindCopy(scope) {
+    $$(".code-block", scope).forEach((block) => {
+      const btn = block.querySelector(".copy-btn");
+      const code = block.querySelector("pre");
+      if (!btn || !code || btn.dataset.boundCopy) return;
+      btn.dataset.boundCopy = "1";
+      btn.addEventListener("click", async () => {
+        try {
+          await navigator.clipboard.writeText(code.textContent || "");
+          btn.textContent = "Copied";
+          setTimeout(() => { btn.textContent = "Copy"; }, 1200);
+        } catch {
+          const ta = document.createElement("textarea");
+          ta.value = code.textContent || "";
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand("copy");
+          ta.remove();
+          btn.textContent = "Copied";
+          setTimeout(() => { btn.textContent = "Copy"; }, 1200);
+        }
+      });
+    });
+  }
+  bindCopy(document);
+  $$(".day-head").forEach((btn) => {
+    btn.addEventListener("click", () => btn.parentElement.classList.toggle("open"));
+  });
+  bindToggles(document);
+
+  $$("input[type=checkbox][data-id]").forEach((box) => {
+    const id = box.getAttribute("data-id");
+    const group = box.getAttribute("data-group") || "checks";
+    if (!state[group]) state[group] = {};
+    box.checked = !!state[group][id];
+    box.addEventListener("change", () => {
+      state[group][id] = box.checked;
+      save(state);
+      updateProgress();
+      updateRevision();
+    });
+  });
+
+  $$("[data-complete]").forEach((btn) => {
+    const group = btn.getAttribute("data-complete");
+    const id = btn.getAttribute("data-cid");
+    if (!state[group]) state[group] = {};
+    if (state[group][id]) {
+      btn.classList.add("done");
+      btn.textContent = "Completed";
+    }
+    btn.addEventListener("click", () => {
+      if (!state[group]) state[group] = {};
+      state[group][id] = !state[group][id];
+      btn.classList.toggle("done", !!state[group][id]);
+      btn.textContent = state[group][id] ? "Completed" : "Mark complete";
+      if (state[group][id]) scheduleReview(id, true);
+      save(state);
+      updateProgress();
+      updateRevision();
+    });
+  });
+
+  const INTERVALS = [1, 3, 7, 14, 30];
+  function scheduleReview(id, ok) {
+    const now = Date.now();
+    const prev = state.items[id] || { interval: 0, fails: 0, status: "not-started" };
+    const next = Object.assign({}, prev, { updated: now });
+    if (ok) {
+      const step = Math.min(prev.interval || 0, INTERVALS.length - 1);
+      next.nextReview = now + INTERVALS[step] * 86400000;
+      next.interval = Math.min(step + 1, INTERVALS.length - 1);
+      next.status = next.interval >= 4 ? "mastered" : "solved";
+    } else {
+      next.nextReview = now + 86400000;
+      next.interval = 0;
+      next.fails = (prev.fails || 0) + 1;
+      next.status = "review";
+    }
+    state.items[id] = next;
+  }
+
+  function setItemStatus(id, status) {
+    const now = Date.now();
+    const prev = state.items[id] || { interval: 0, fails: 0 };
+    const next = Object.assign({}, prev, { status, updated: now });
+    if (status === "mastered") {
+      next.nextReview = now + 30 * 86400000;
+      next.interval = 4;
+    } else if (status === "solved") {
+      scheduleReview(id, true);
+      return;
+    } else if (status === "attempted" || status === "review") {
+      next.nextReview = now + 86400000;
+      if (status === "attempted") next.fails = (prev.fails || 0) + 1;
+    }
+    state.items[id] = next;
+    save(state);
+    paintItem(id);
+    updateProgress();
+    updateRevision();
+  }
+  function paintItem(id) {
+    const card = document.querySelector('[data-pid="' + id + '"]');
+    if (!card) return;
+    const st = (state.items[id] && state.items[id].status) || "not-started";
+    card.setAttribute("data-status", st);
+    $$(".status-btns button", card).forEach((b) => {
+      b.className = b.className.replace(/active-\S+/g, "").trim();
+      if (b.getAttribute("data-status") === st) b.classList.add("active-" + st);
+    });
+  }
+  $$("[data-pid]").forEach((card) => {
+    const id = card.getAttribute("data-pid");
+    $$(".status-btns button", card).forEach((b) => {
+      b.addEventListener("click", () => setItemStatus(id, b.getAttribute("data-status")));
+    });
+    paintItem(id);
+  });
+
+  function applyCardFilters() {
+    const st = ($("#filter-status") && $("#filter-status").value) || "all";
+    const cat = ($("#filter-cat") && $("#filter-cat").value) || "all";
+    const q = (($("#filter-text") && $("#filter-text").value) || "").toLowerCase();
+    $$("[data-filterable]").forEach((card) => {
+      const id = card.getAttribute("data-pid") || card.id;
+      const status = (state.items[id] && state.items[id].status) || (state.questions[id] ? "solved" : "not-started");
+      const okS = st === "all" || (st === "complete" && (status === "solved" || status === "mastered")) ||
+        (st === "incomplete" && status !== "solved" && status !== "mastered") ||
+        (st === "weak" && status === "attempted") ||
+        (st === "review" && status === "review") || status === st;
+      const okC = cat === "all" || card.getAttribute("data-cat") === cat;
+      const text = ((card.getAttribute("data-search") || "") + " " + card.textContent).toLowerCase();
+      card.classList.toggle("hidden", !(okS && okC && (!q || text.includes(q))));
+    });
+  }
+  ["filter-status", "filter-cat", "filter-text"].forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener("input", applyCardFilters);
+  });
+
+  const searchInput = $("#global-search");
+  const searchBox = $("#search-results");
+  const searchIndex = $$("[data-search]").map((el) => ({
+    title: el.getAttribute("data-search"),
+    type: el.getAttribute("data-stype") || "Section",
+    href: "#" + (el.id || (el.closest("section") && el.closest("section").id) || ""),
+    excerpt: (el.textContent || "").replace(/\s+/g, " ").trim().slice(0, 120)
+  }));
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  }
+  function runSearch(q) {
+    if (!searchBox) return;
+    const query = q.trim().toLowerCase();
+    if (!query) { searchBox.classList.remove("open"); searchBox.innerHTML = ""; return; }
+    const hits = searchIndex.filter((x) =>
+      x.title.toLowerCase().includes(query) || (x.excerpt && x.excerpt.toLowerCase().includes(query))
+    ).slice(0, 20);
+    searchBox.innerHTML = hits.length
+      ? hits.map((h) => '<a href="' + h.href + '">' + escapeHtml(h.title) + "<small>" + escapeHtml(h.type) + " · " + escapeHtml(h.excerpt) + "</small></a>").join("")
+      : '<a href="#dashboard">No matches</a>';
+    searchBox.classList.add("open");
+  }
+  searchInput && searchInput.addEventListener("input", () => runSearch(searchInput.value));
+  searchInput && searchInput.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") { searchBox.classList.remove("open"); searchInput.blur(); }
+  });
+  document.addEventListener("click", (e) => {
+    if (searchBox && !searchBox.contains(e.target) && e.target !== searchInput) searchBox.classList.remove("open");
+  });
+
+  function countTrue(obj) { return Object.values(obj || {}).filter(Boolean).length; }
+  function setText(sel, val) { const el = $(sel); if (el) el.textContent = val; }
+  function setWidth(sel, val) { const el = $(sel); if (el) el.style.width = val; }
+  function pct(n, d) { return Math.round((n / (d || 1)) * 100); }
+
+  function updateProgress() {
+    const dayDone = countTrue(state.checks);
+    const dayTotal = $$('input[type=checkbox][data-group="checks"]').length || 1;
+    const archDone = countTrue(state.topics);
+    const archTotal = $$("[data-complete=topics]").length || 1;
+    const reactDone = countTrue(state.reactTopics);
+    const reactTotal = $$("[data-complete=reactTopics]").length || 1;
+    const qsDone = countTrue(state.questions);
+    const qsTotal = $$("[data-complete=questions]").length || 1;
+    const sdDone = countTrue(state.designs);
+    const sdTotal = $$("[data-complete=designs]").length || 1;
+    const exDone = countTrue(state.exercises);
+    const exTotal = $$("[data-complete=exercises]").length || 1;
+    const readyDone = countTrue(state.readiness);
+    const readyTotal = $$('input[type=checkbox][data-group="readiness"]').length || 1;
+    const mocks = (state.mocks || []).length;
+    const now = Date.now();
+    const reviewN = Object.values(state.items).filter((p) => p.nextReview && p.nextReview <= now && p.status !== "mastered").length;
+
+    const overall = Math.round((
+      (dayDone / dayTotal) * 0.18 +
+      (archDone / archTotal) * 0.16 +
+      (reactDone / reactTotal) * 0.16 +
+      (qsDone / qsTotal) * 0.14 +
+      (sdDone / sdTotal) * 0.14 +
+      (exDone / (exTotal || 1)) * 0.08 +
+      Math.min(mocks / 6, 1) * 0.06 +
+      (readyDone / readyTotal) * 0.08
+    ) * 100);
+
+    setText("#overall-pct", overall + "%");
+    setWidth("#overall-bar", overall + "%");
+    setText("#stat-days", pct(dayDone, dayTotal) + "%");
+    setWidth("#bar-days", pct(dayDone, dayTotal) + "%");
+    setText("#stat-arch", pct(archDone, archTotal) + "%");
+    setWidth("#bar-arch", pct(archDone, archTotal) + "%");
+    setText("#stat-react", pct(reactDone, reactTotal) + "%");
+    setWidth("#bar-react", pct(reactDone, reactTotal) + "%");
+    setText("#stat-qs", qsDone + " / " + qsTotal);
+    setWidth("#bar-qs", pct(qsDone, qsTotal) + "%");
+    setText("#stat-sd", sdDone + " / " + sdTotal);
+    setWidth("#bar-sd", pct(sdDone, sdTotal) + "%");
+    setText("#stat-mocks", String(mocks));
+    setText("#stat-ready", pct(readyDone, readyTotal) + "%");
+    setWidth("#bar-ready", pct(readyDone, readyTotal) + "%");
+    setText("#stat-review", String(reviewN));
+    setText("#stat-ex", exDone + " / " + exTotal);
+    setWidth("#bar-ex", pct(exDone, exTotal) + "%");
+    setText("#track-days", dayDone + " / " + dayTotal + " daily tasks");
+    setText("#track-arch", archDone + " / " + archTotal);
+    setText("#track-react", reactDone + " / " + reactTotal);
+    setText("#track-qs", qsDone + " / " + qsTotal);
+    setText("#track-sd", sdDone + " / " + sdTotal);
+    setText("#track-ex", exDone + " / " + exTotal);
+    setText("#ready-score", pct(readyDone, readyTotal) + "%");
+    setWidth("#bar-ready-final", pct(readyDone, readyTotal) + "%");
+    const cats = [
+      ["#bar-cat-react", reactDone, reactTotal],
+      ["#bar-cat-arch", archDone, archTotal],
+      ["#bar-cat-perf", $$("[data-cat=performance] [data-complete].done").length, $$("[data-cat=performance] [data-complete]").length],
+      ["#bar-cat-sd", sdDone, sdTotal],
+      ["#bar-cat-browser", $$("[data-cat=browser] [data-complete].done").length, $$("[data-cat=browser] [data-complete]").length],
+      ["#bar-cat-sec", $$("[data-cat=security] [data-complete].done").length, $$("[data-cat=security] [data-complete]").length],
+      ["#bar-cat-test", $$("[data-cat=testing] [data-complete].done").length, $$("[data-cat=testing] [data-complete]").length]
+    ];
+    cats.forEach(([sel, n, d]) => setWidth(sel, pct(n, d || 1) + "%"));
+    const gate = $("#ready-gate");
+    if (gate) {
+      gate.textContent = readyDone / readyTotal >= 0.85
+        ? "You look ready to walk in: console plugins, PatternFly 6, and the three signals as one troubleshooting path."
+        : "Stay in this file until this checklist is honestly above ~85%.";
+    }
+  }
+
+  function updateRevision() {
+    const now = Date.now();
+    const week = now + 7 * 86400000;
+    const dueToday = [], dueWeek = [], failed = [], mastered = [], weak = {};
+    Object.entries(state.items).forEach(([id, p]) => {
+      const el = document.querySelector('[data-pid="' + id + '"], #' + CSS.escape(id));
+      const name = (el && (el.getAttribute("data-search") || el.querySelector("h3") && el.querySelector("h3").textContent)) || id;
+      if (p.status === "mastered") mastered.push(name);
+      if (p.status === "attempted" || (p.fails || 0) > 0) {
+        failed.push(name);
+        const cat = el && el.getAttribute("data-cat");
+        if (cat) weak[cat] = (weak[cat] || 0) + 1;
+      }
+      if (p.nextReview && p.status !== "mastered") {
+        if (p.nextReview <= now) dueToday.push(name);
+        else if (p.nextReview <= week) dueWeek.push(name);
+      }
+    });
+    fillList("#rev-today", dueToday);
+    fillList("#rev-week", dueWeek);
+    fillList("#rev-failed", failed.slice(0, 12));
+    fillList("#rev-mastered", mastered);
+    fillList("#rev-weak", Object.entries(weak).sort((a, b) => b[1] - a[1]).map(([k, n]) => k + " (" + n + ")"));
+  }
+  function fillList(sel, items) {
+    const el = $(sel);
+    if (!el) return;
+    el.innerHTML = items.length ? items.map((x) => "<li>" + escapeHtml(x) + "</li>").join("") : "<li>None yet</li>";
+  }
+
+  let mockTimer = null, mockLeft = 0, currentMock = null;
+  function fmt(sec) {
+    const m = Math.floor(sec / 60), s = sec % 60;
+    return String(m).padStart(2, "0") + ":" + String(s).padStart(2, "0");
+  }
+  function allMockables() {
+    return $$("[data-mock]").map((card) => ({
+      id: card.id,
+      name: card.getAttribute("data-search") || (card.querySelector("h3") && card.querySelector("h3").textContent) || card.id,
+      cat: card.getAttribute("data-cat") || "architecture",
+      html: card.innerHTML
+    }));
+  }
+  function renderMock(p, minutes) {
+    currentMock = p;
+    mockLeft = minutes * 60;
+    const panel = $("#mock-panel");
+    panel.innerHTML =
+      '<div class="meta-row"><span class="badge badge-pattern">' + escapeHtml(p.cat) + "</span>" +
+      '<span class="chip">' + minutes + " min</span></div>" +
+      "<h3>" + escapeHtml(p.name) + "</h3>" +
+      '<div class="timer" id="mock-timer">' + fmt(mockLeft) + "</div>" +
+      '<div class="status-btns">' +
+      '<button type="button" id="mock-start-timer">Start timer</button>' +
+      '<button type="button" id="mock-pause">Pause</button></div>' +
+      '<div class="problem-body">' + p.html + "</div>";
+    $("#mock-start-timer") && $("#mock-start-timer").addEventListener("click", startTimer);
+    $("#mock-pause") && $("#mock-pause").addEventListener("click", stopTimer);
+    bindToggles(panel);
+    bindCopy(panel);
+  }
+  function tick() {
+    mockLeft = Math.max(0, mockLeft - 1);
+    const el = $("#mock-timer");
+    if (el) el.textContent = fmt(mockLeft);
+    if (mockLeft === 0) stopTimer();
+  }
+  function startTimer() { stopTimer(); mockTimer = setInterval(tick, 1000); }
+  function stopTimer() { if (mockTimer) clearInterval(mockTimer); mockTimer = null; }
+
+  $$("[data-start-mock]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const minutes = Number(btn.getAttribute("data-start-mock")) || 30;
+      const cat = ($("#mock-cat") && $("#mock-cat").value) || "all";
+      let list = allMockables();
+      if (cat !== "all") list = list.filter((x) => x.cat === cat);
+      if (!list.length) list = allMockables();
+      if (!list.length) return;
+      renderMock(list[Math.floor(Math.random() * list.length)], minutes);
+    });
+  });
+
+  const saveMock = $("#save-mock");
+  saveMock && saveMock.addEventListener("click", () => {
+    if (!currentMock) { alert("Start a mock interview first."); return; }
+    const rec = {
+      id: currentMock.id,
+      name: currentMock.name,
+      date: new Date().toISOString(),
+      tradeoffs: $("#mock-q-trade") && $("#mock-q-trade").checked,
+      onTime: $("#mock-q-time") && $("#mock-q-time").checked,
+      a11y: $("#mock-q-a11y") && $("#mock-q-a11y").checked,
+      notes: ($("#mock-notes") && $("#mock-notes").value) || "",
+      confidence: ($("#mock-confidence") && $("#mock-confidence").value) || "3"
+    };
+    state.mocks.push(rec);
+    save(state);
+    renderMockHistory();
+    updateProgress();
+    alert("Mock saved locally.");
+  });
+  function renderMockHistory() {
+    const el = $("#mock-history");
+    if (!el) return;
+    if (!state.mocks.length) {
+      el.innerHTML = "<p class='stat-sub'>No teach-backs yet. Target 6 timed explanations before calling the guide done.</p>";
+      return;
+    }
+    el.innerHTML = "<ul class='tight'>" + state.mocks.slice().reverse().map((m) =>
+      "<li>" + escapeHtml(m.date.slice(0, 10)) + " — <b>" + escapeHtml(m.name) + "</b> · confidence " +
+      escapeHtml(m.confidence) + "/5</li>"
+    ).join("") + "</ul>";
+  }
+
+  $$(".dbg-next").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const wrap = btn.closest(".topic, .problem, article");
+      const hidden = $$(".clue.hidden, .reveal:not(.open)", wrap).filter((x) => x.classList.contains("clue") || x.classList.contains("reveal"));
+      const next = $$(".clue", wrap).find((c) => !c.classList.contains("open") && c.hasAttribute("data-clue"));
+      const clues = $$("[data-clue]", wrap);
+      const unseen = clues.find((c) => !c.classList.contains("open"));
+      if (unseen) unseen.classList.add("open");
+    });
+  });
+
+  const resetBtn = $("#reset-progress");
+  resetBtn && resetBtn.addEventListener("click", () => {
+    if (!confirm("Reset all progress on this guide in this browser? This cannot be undone.")) return;
+    const theme = state.theme;
+    state = defaultState();
+    state.theme = theme;
+    save(state);
+    location.reload();
+  });
+
+  $$(".tabs").forEach((wrap) => {
+    const group = wrap.getAttribute("data-tabs");
+    $$(".tab", wrap).forEach((tab) => {
+      tab.addEventListener("click", () => {
+        $$(".tab", wrap).forEach((t) => t.classList.remove("active"));
+        tab.classList.add("active");
+        const which = tab.getAttribute("data-tab");
+        if (group === "feq") {
+          $$(".q[data-level]").forEach((card) => {
+            card.classList.toggle("hidden", which !== "all" && card.getAttribute("data-level") !== which && card.getAttribute("data-cat") !== which);
+          });
+          return;
+        }
+        $$("[data-tabpanel='" + group + "']").forEach((p) => {
+          p.classList.toggle("hidden", p.getAttribute("data-tab") !== which);
+        });
+      });
+    });
+  });
+
+  const navLinks = $$(".sidebar a[href^='#']");
+  const sections = navLinks.map((a) => document.querySelector(a.getAttribute("href"))).filter(Boolean);
+  function onScroll() {
+    let current = sections[0];
+    sections.forEach((s) => { if (s.getBoundingClientRect().top <= 90) current = s; });
+    navLinks.forEach((a) => a.classList.toggle("active", current && a.getAttribute("href") === "#" + current.id));
+  }
+  document.addEventListener("scroll", onScroll, { passive: true });
+  $("#back-top") && $("#back-top").addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
+
+  const gq = $("#glossary-filter");
+  gq && gq.addEventListener("input", () => {
+    const q = gq.value.toLowerCase();
+    $$(".glossary-item").forEach((el) => {
+      el.classList.toggle("hidden", q && !el.getAttribute("data-search").toLowerCase().includes(q) && !el.textContent.toLowerCase().includes(q));
+    });
+  });
+
+  updateProgress();
+  updateRevision();
+  renderMockHistory();
+  applyCardFilters();
+})();
+
+</script>
+</body>
+</html>

@@ -1,0 +1,192 @@
+DAYS = [
+  {"n": 1, "title": "How to use + the job",
+   "learn": "How to use this and The job. You are the UI catalyst.",
+   "do": "Write 8 lines: a product you know, where Observe would help, what must stay a backend contract.",
+   "verbal": "What does this role own that a backend metrics engineer does not?",
+   "rev": "None — day 1."},
+  {"n": 2, "title": "Observe surfaces",
+   "learn": "Metrics, logs, traces, Perses, troubleshooting panel, incidents.",
+   "do": "Draw the Observe menu from memory. Label the backend for each item.",
+   "verbal": "CMO vs COO in one minute.",
+   "rev": "The job."},
+  {"n": 3, "title": "Kubernetes enough to debug",
+   "learn": "Namespace, Service, Route, RBAC, CRD. Why dashboards are namespaced.",
+   "do": "Install oc and kubectl. Run oc help. Read a UIPlugin YAML example in this file.",
+   "verbal": "Why would a GitOps Console spec wipe a plugin?",
+   "rev": "Observe surfaces."},
+  {"n": 4, "title": "PromQL start",
+   "learn": "rate, increase, histogram_quantile, by/without. Instant vs range.",
+   "do": "Stand up Prometheus (kind + kube-prometheus-stack or a local binary). Write 5 queries.",
+   "verbal": "When is rate() wrong?",
+   "rev": "RBAC one-liner."},
+  {"n": 5, "title": "Three signals",
+   "learn": "Metric vs log vs trace. When each is the starting point.",
+   "do": "For CrashLoop, high latency, and a 500 error — pick the first signal and the second.",
+   "verbal": "Why is a trace not a substitute for a metric?",
+   "rev": "PromQL five queries."},
+  {"n": 6, "title": "Console plugin model",
+   "learn": "Webpack 5 federation, ConsolePlugin CR, spec.plugins, spec.proxy.",
+   "do": "Clone console-plugin-template. Read package.json consolePlugin and console-extensions.json.",
+   "verbal": "What does the console Operator spec.plugins list do?",
+   "rev": "Three signals."},
+  {"n": 7, "title": "Local plugin loop",
+   "learn": "Yarn, podman/docker, start-console, plugin assets via /api/plugins/.",
+   "do": "Get the template README loop as far as your machine allows. Note blockers.",
+   "verbal": "Why Webpack 5, not Vite, for these plugins?",
+   "rev": "ConsolePlugin YAML."},
+  {"n": 8, "title": "PatternFly 6",
+   "learn": "OCP 4.19+ is PF 6. No Tailwind. No PF CSS imports in the plugin.",
+   "do": "Build a filterable table and a form in PF 6. Keyboard only.",
+   "verbal": "Why must you not import @patternfly/patternfly CSS?",
+   "rev": "Plugin loop."},
+  {"n": 9, "title": "Accessibility as a ship gate",
+   "learn": "WCAG 2.2 AA in practice. Charts not color-only. Live regions.",
+   "do": "axe DevTools on your PF screens. Fix the first five issues.",
+   "verbal": "Name two PF components that help a11y if you use them correctly.",
+   "rev": "PF class prefixing."},
+  {"n": 10, "title": "monitoring-plugin skim",
+   "learn": "CMO features vs COO features. ACM alerts, Perses, incidents.",
+   "do": "Read the README. List extension points you see.",
+   "verbal": "What is a feature flag doing in this plugin?",
+   "rev": "a11y fixes."},
+  {"n": 11, "title": "LogQL",
+   "learn": "Stream selectors, line filters, JSON, metric queries from logs.",
+   "do": "Run Loki or read LogQL docs with a sample log line. Write 5 queries.",
+   "verbal": "viaq vs OTel log schema — why does the UI care?",
+   "rev": "monitoring-plugin flags."},
+  {"n": 12, "title": "OpenTelemetry demo",
+   "learn": "span, resource, service.name, collector pipelines.",
+   "do": "Run the OTel demo (or watch a recorded walkthrough and take notes if you cannot run it). Follow one checkout.",
+   "verbal": "Collector vs SDK vs backend.",
+   "rev": "LogQL."},
+  {"n": 13, "title": "Tempo and TraceQL",
+   "learn": "TempoStack. Trace search vs Jaeger-as-product (legacy in talks).",
+   "do": "Skim distributed-tracing-console-plugin README / AGENTS.md.",
+   "verbal": "Why does that plugin have a Go backend?",
+   "rev": "OTel demo."},
+  {"n": 14, "title": "Timeseries UI performance",
+   "learn": "Abort in-flight queries, resolution/step, virtualize 20k rows.",
+   "do": "Prototype a virtual list or read how a plugin table paginates.",
+   "verbal": "What happens if the user drags the time picker during a fetch?",
+   "rev": "TraceQL."},
+  {"n": 15, "title": "Perses",
+   "learn": "Dashboards as Kubernetes resources. Grafana import. Observe → Dashboards.",
+   "do": "Read COO Perses docs. Clone perses if you can run the UI.",
+   "verbal": "Why namespace-scoped dashboards?",
+   "rev": "Week 2 plugin model."},
+  {"n": 16, "title": "UIPlugin YAML",
+   "learn": "Cluster Observability Operator installs plugins from UIPlugin CRs.",
+   "do": "Copy the monitoring + perses YAML from this file. Explain each field.",
+   "verbal": "What does the operator do that the frontend cannot?",
+   "rev": "Perses."},
+  {"n": 17, "title": "Korrel8r",
+   "learn": "Alert → related metrics, logs, pods, netflows. Graph in the panel.",
+   "do": "Read troubleshooting-panel AGENTS.md. Note URL mapping tests.",
+   "verbal": "What breaks if Logging plugin is not installed?",
+   "rev": "UIPlugin."},
+  {"n": 18, "title": "ACM / multi-cluster",
+   "learn": "Thanos query, hub Alertmanager, cluster context in the UI.",
+   "do": "Write 6 lines: what extra props a multi-cluster alerts page needs.",
+   "verbal": "Why is ‘cluster’ a first-class filter?",
+   "rev": "Korrel8r."},
+  {"n": 19, "title": "i18n and reviews",
+   "learn": "react-i18next namespaces. Reviews catch missing keys.",
+   "do": "Find i18n usage in one plugin. List a bad PR comment you would leave.",
+   "verbal": "Hard-coded English in a table header — why is that a block?",
+   "rev": "ACM."},
+  {"n": 20, "title": "Go proxy literacy",
+   "learn": "Read one HTTP handler. client-go, mux, proxy to Tempo or Korrel8r.",
+   "do": "Trace one request from the UI to the in-cluster service on paper.",
+   "verbal": "Why HTTPS + service CA for plugin proxies?",
+   "rev": "i18n."},
+  {"n": 21, "title": "Incidents UX",
+   "learn": "Group alert bursts. Timeline. Severity. Component.",
+   "do": "Sketch the empty state and the ‘1000 alerts, 3 incidents’ state.",
+   "verbal": "What must you not hide when you group?",
+   "rev": "Go handler."},
+  {"n": 22, "title": "Netflows (light)",
+   "learn": "Network observability as another Korrel8r domain.",
+   "do": "Read a short NetObserv overview. One paragraph in your notes.",
+   "verbal": "When would you start from flows instead of logs?",
+   "rev": "Incidents."},
+  {"n": 23, "title": "Read three merged PRs",
+   "learn": "monitoring-plugin theming, incidents, or ACM. Note review comments.",
+   "do": "Write: a11y, i18n, feature flag, PF misuse — one example each if you find them.",
+   "verbal": "What would you ask the author in review?",
+   "rev": "Netflows."},
+  {"n": 24, "title": "Tiny upstream PR",
+   "learn": "DCO Signed-off-by. OWNERS. Good first issue on PatternFly, Perses, or docs.",
+   "do": "Open or draft a tiny docs/test PR. Practice the sign-off.",
+   "verbal": "What is DCO for?",
+   "rev": "PR comments."},
+  {"n": 25, "title": "CrashLoop story",
+   "learn": "Design on paper: metrics, logs, traces, related resources.",
+   "do": "One page with fail paths (no Loki, no Tempo, RBAC deny).",
+   "verbal": "Teach it in 8 minutes.",
+   "rev": "DCO."},
+  {"n": 26, "title": "Senior behaviors",
+   "learn": "Lead, collaborate, upstream, mentor, community — mapped to real artifacts.",
+   "do": "Rewrite the job bullets in your own words with plugin examples.",
+   "verbal": "A feature flag vs a new plugin — when?",
+   "rev": "CrashLoop page."},
+  {"n": 27, "title": "Do not over-invest check",
+   "learn": "Skip list. Confirm you did not rabbit-hole Grafana plugins or eBPF.",
+   "do": "Cross off two things you will not study this month.",
+   "verbal": "What did you skip and why?",
+   "rev": "Senior behaviors."},
+  {"n": 28, "title": "Architecture one-pager",
+   "learn": "Plugins, COO, signals, UX, upstream. First 30 days on the team.",
+   "do": "Write it. You will reuse this in 1:1s.",
+   "verbal": "Walk the one-pager without looking.",
+   "rev": "Skip list."},
+  {"n": 29, "title": "Readiness pass 1",
+   "learn": "Checklist. Honest gaps.",
+   "do": "Fill the gaps you can in one sitting. Book the rest for day 30.",
+   "verbal": "Weakest of: plugin loop, PF, queries.",
+   "rev": "One-pager."},
+  {"n": 30, "title": "Gate",
+   "learn": "Readiness ~85%. Light revision only.",
+   "do": "20-minute tour: plugin → PF → PromQL → Loki → Tempo → Korrel8r.",
+   "verbal": "I don’t know — then the next experiment.",
+   "rev": "Due today only."},
+]
+
+
+def plan() -> str:
+    cards = []
+    for d in DAYS:
+        n = d["n"]
+        body = [
+            f'<label class="task"><input type="checkbox" data-id="d{n}-rev" data-group="checks" /><span><b>Revision</b> {d["rev"]}</span></label>',
+            f'<label class="task"><input type="checkbox" data-id="d{n}-learn" data-group="checks" /><span><b>Concept</b> {d["learn"]}</span></label>',
+            f'<label class="task"><input type="checkbox" data-id="d{n}-do" data-group="checks" /><span><b>Exercise</b> {d["do"]}</span></label>',
+            f'<label class="task"><input type="checkbox" data-id="d{n}-verbal" data-group="checks" /><span><b>Verbal</b> {d["verbal"]}</span></label>',
+        ]
+        cards.append(f'''<article class="day" id="gl-day-{n}">
+  <button type="button" class="day-head">
+    <div>
+      <h3>Day {n} — {d["title"]}</h3>
+      <div class="day-meta">~2 hours · read, then make something small</div>
+    </div>
+    <span class="badge badge-pattern">Day {n}</span>
+  </button>
+  <div class="day-body">{''.join(body)}</div>
+</article>''')
+    return f'''
+<section class="block" id="plan" data-search="30-Day plan before we start" data-stype="Section">
+  <p class="kicker">Schedule</p>
+  <h2 class="section-title">30-Day plan</h2>
+  <p class="lede">Six days a week is enough. If you miss a day, finish the concept + one install step — do not binge three plugin repos. GPU not required. A laptop, <code>oc</code>, and a throwaway cluster (or CRC) is the luxury version.</p>
+  <div class="card" style="margin-bottom:16px">
+    <h3>Daily cadence</h3>
+    <table>
+      <tr><th>Time</th><th>Block</th><th>Rule</th></tr>
+      <tr><td>10 min</td><td>Revision</td><td>Yesterday’s definition from memory.</td></tr>
+      <tr><td>45 min</td><td>Lesson</td><td>Read until you can teach the diagram.</td></tr>
+      <tr><td>45 min</td><td>Do</td><td>Install, clone, query, or sketch.</td></tr>
+      <tr><td>20 min</td><td>Verbal</td><td>Product example + what you would not build.</td></tr>
+    </table>
+  </div>
+  {''.join(cards)}
+</section>
+'''
