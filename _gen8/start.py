@@ -6,7 +6,7 @@ def dashboard() -> str:
 <section class="block" id="dashboard" data-search="Gotta learn before we start dashboard" data-stype="Section">
   <p class="kicker">30 days · OpenShift Observe UI</p>
   <h2 class="section-title">Gotta learn before we start</h2>
-  <p class="lede">You already know React and TypeScript. The extra edge is not another framework. It is speaking <b>Observe</b> the way this team ships it: OpenShift <b>console dynamic plugins</b>, <b>PatternFly 6</b>, and turning <b>metrics, logs, and traces</b> into one troubleshooting path — then landing that in <b>upstream GitHub</b>.</p>
+  <p class="lede">You already know React and TypeScript. The extra edge is not another framework. It is speaking <b>Observe</b> the way this team ships it: OpenShift <b>console dynamic plugins</b>, <b>PatternFly 6</b>, and turning <b>metrics, logs, and traces</b> into one troubleshooting path — then landing that in <b>upstream GitHub</b>. Each topic below is a <b>tutorial on this page</b> — you should not need another site to understand ConsolePlugin, PromQL, or PatternFly 6 at the level this job uses.</p>
 
   <div class="card" style="margin-bottom:16px">
     <h3>What “ready” means here</h3>
@@ -38,9 +38,9 @@ def dashboard() -> str:
     <div class="card">
       <h3>How to use this file</h3>
       <ol class="tight">
-        <li>Open the <b>30-Day Plan</b>. Check every box.</li>
-        <li>Read one lesson. Say the idea out loud before the code.</li>
-        <li>Do the week’s install or clone, not only the reading.</li>
+        <li>Open the named <b>tutorial</b> in the sidebar (not only the 30-day card).</li>
+        <li>Read until you can teach the diagram. Mark the lesson complete.</li>
+        <li>Do that day’s install or sketch. Check the plan boxes.</li>
         <li>Leave when Readiness is honestly ~85% and you can teach the plugin loop without notes.</li>
       </ol>
     </div>
@@ -68,6 +68,7 @@ def howto() -> str:
     t = topic("ht-edge", "Four things beat reading every repo",
               "how to use this 30 day guide", "Lesson",
               """
+  <p>Tutorials live in this HTML. Use the sidebar: Kubernetes, plugins, PatternFly, PromQL, LogQL, traces, Observe UX, Perses, Korrel8r. Clone repos <i>after</i> you can teach the matching tutorial.</p>
   <p>You will not finish every plugin repository. Finish a loop you can demonstrate:</p>
   <ol>
     <li><b>Plugin template running</b> against a cluster (or the documented local console container).</li>

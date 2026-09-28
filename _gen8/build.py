@@ -5,9 +5,12 @@ from header import html_head, html_foot
 from start import dashboard, howto, role
 from plan import plan
 from lessons import (
-    observe, plugins, patternfly, signals, queries, perses, korrel8r,
+    observe, plugins, patternfly, signals, perses, korrel8r,
     tools, repos, skip, senior,
 )
+from k8s import k8s
+from queries import promql, logql, traceql
+from ux import ux
 from practical import practical
 from questions import feq
 from drills import drills
@@ -27,10 +30,14 @@ def main() -> None:
         plan(),
         role(),
         observe(),
+        k8s(),
         plugins(),
         patternfly(),
         signals(),
-        queries(),
+        promql(),
+        logql(),
+        traceql(),
+        ux(),
         perses(),
         korrel8r(),
         tools(),

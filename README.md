@@ -14,7 +14,7 @@ To add a future company or topic: add a track in `index.html` (`TRACKS`), then r
 
 **AI Engineer (basics → production):** `ai-engineer.html` — foundations, classical ML, deep learning, RAG, agents, eval, safety, MLOps. Progress key: `ai-eng-v1`. Rebuild: `python3 _gen7/build.py`.
 
-**Gotta learn before we start:** `gotta-learn.html` — 30-day onboarding for OpenShift Observe UI (console dynamic plugins, PatternFly 6, PromQL/LogQL/TraceQL, Perses, Korrel8r). Progress key: `pre-start-v1`. Rebuild: `python3 _gen8/build.py`.
+**Gotta learn before we start:** `gotta-learn.html` — in-page tutorials (console plugins, PatternFly 6, PromQL/LogQL/TraceQL, Perses, Korrel8r) plus a 30-day plan. Progress key: `pre-start-v1`. Rebuild: `python3 _gen8/build.py`.
 
 ---
 

@@ -152,11 +152,48 @@ DAYS = [
 ]
 
 
+# Sidebar tutorial to open for that day's concept (learn on this page first).
+TUTS = {
+    1: ("#howto", "How to use"),
+    2: ("#observe", "Observe surfaces"),
+    3: ("#k8s", "Kubernetes enough"),
+    4: ("#promql", "PromQL"),
+    5: ("#signals", "Three signals"),
+    6: ("#plugins", "Console plugins"),
+    7: ("#plugins", "Console plugins — local loop"),
+    8: ("#patternfly", "PatternFly 6"),
+    9: ("#patternfly", "PatternFly — accessibility"),
+    10: ("#repos", "Repos to clone"),
+    11: ("#logql", "LogQL"),
+    12: ("#traceql", "Traces and OpenTelemetry"),
+    13: ("#traceql", "Traces and OpenTelemetry"),
+    14: ("#ux", "Observe UX"),
+    15: ("#perses", "Perses"),
+    16: ("#plugins", "UIPlugin / enablement"),
+    17: ("#korrel8r", "Correlation"),
+    18: ("#promql", "PromQL — multi-cluster notes"),
+    19: ("#patternfly", "PatternFly — i18n"),
+    20: ("#plugins", "ConsolePlugin proxy"),
+    21: ("#signals", "Incidents"),
+    22: ("#korrel8r", "Correlation — netflows"),
+    23: ("#repos", "How to read a plugin repo"),
+    24: ("#tools", "DCO / Signed-off-by"),
+    25: ("#signals", "Three signals — journeys"),
+    26: ("#senior", "Senior behaviors"),
+    27: ("#skip", "Do not over-invest"),
+    28: ("#senior", "Architecture one-pager"),
+    29: ("#readiness", "Readiness checklist"),
+    30: ("#readiness", "Readiness checklist"),
+}
+
+
 def plan() -> str:
     cards = []
     for d in DAYS:
         n = d["n"]
+        href, label = TUTS[n]
         body = [
+            f'<p><a href="{href}">Open tutorial: {label} →</a></p>',
             f'<label class="task"><input type="checkbox" data-id="d{n}-rev" data-group="checks" /><span><b>Revision</b> {d["rev"]}</span></label>',
             f'<label class="task"><input type="checkbox" data-id="d{n}-learn" data-group="checks" /><span><b>Concept</b> {d["learn"]}</span></label>',
             f'<label class="task"><input type="checkbox" data-id="d{n}-do" data-group="checks" /><span><b>Exercise</b> {d["do"]}</span></label>',
@@ -176,7 +213,7 @@ def plan() -> str:
 <section class="block" id="plan" data-search="30-Day plan before we start" data-stype="Section">
   <p class="kicker">Schedule</p>
   <h2 class="section-title">30-Day plan</h2>
-  <p class="lede">Six days a week is enough. If you miss a day, finish the concept + one install step — do not binge three plugin repos. GPU not required. A laptop, <code>oc</code>, and a throwaway cluster (or CRC) is the luxury version.</p>
+  <p class="lede">Six days a week is enough. Each day’s <b>Concept</b> is a tutorial in the sidebar (Kubernetes, plugins, PromQL, …) — read it here, then do the install or sketch. If you miss a day, finish the tutorial + one install step — do not binge three plugin repos.</p>
   <div class="card" style="margin-bottom:16px">
     <h3>Daily cadence</h3>
     <table>

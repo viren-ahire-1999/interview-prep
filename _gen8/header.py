@@ -39,12 +39,16 @@ def html_head(css: str) -> str:
       <a href="#role">The job</a>
     </div>
     <div class="nav-group">
-      <h2>The system</h2>
+      <h2>Tutorials</h2>
       <a href="#observe">Observe surfaces</a>
+      <a href="#k8s">Kubernetes enough</a>
       <a href="#plugins">Console plugins</a>
       <a href="#patternfly">PatternFly 6</a>
       <a href="#signals">Three signals</a>
-      <a href="#queries">Query languages</a>
+      <a href="#promql">PromQL</a>
+      <a href="#logql">LogQL</a>
+      <a href="#traceql">Traces and OTel</a>
+      <a href="#ux">Observe UX</a>
       <a href="#perses">Perses</a>
       <a href="#korrel8r">Correlation</a>
     </div>
